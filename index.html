@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#234123">
+  <meta name="description" content="Material management and product price calculation app">
+  <title>Home - Product App</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Product App">
+</head>
+<body>
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-link active">Home</a>
+    <a href="add-material.html" class="sidebar-link">Add Material</a>
+    <a href="product-price.html" class="sidebar-link">Product Price</a>
+  </aside>
+  <main class="main-content">
+    <div class="container card" style="max-width:500px;margin:0 auto;">
+      <h2 style="font-size:2rem;font-weight:700;margin-bottom:1.5rem;text-align:center;">Welcome to Product App</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <a class="btn" style="background:#234123;" href="add-material.html">Add Material</a>
+        <a class="btn" style="background:#234123;" href="product-price.html">Product Price Calculator</a>
+        <a class="btn" style="background:#234123;" href="all-materials.html">All Purchases</a>
+      </div>
+    </div>
+  </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+      const firebaseConfig = {
+        apiKey: "AIzaSyA-iSMXwphhv_A2cioqul2Ov_7FNFGuNYE",
+        authDomain: "new-one-a7334.firebaseapp.com",
+        projectId: "new-one-a7334",
+        storageBucket: "new-one-a7334.firebasestorage.app",
+        messagingSenderId: "217305568602",
+        appId: "1:217305568602:web:23c503ff08170cf5888f63",
+        measurementId: "G-ZYRLMHDPNF"
+      };
+      try {
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        // Initialize Firestore silently
+        getDocs(collection(db, "materials")).catch(console.error);
+      } catch (err) {
+        console.error('Firebase initialization error:', err);
+      }
+    </script>
+</body>
+</html>

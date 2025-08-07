@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All Materials</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @media (max-width: 900px) {
+      .sidebar { width: 120px; }
+      .main-content { margin-left: 130px; }
+    }
+    @media (max-width: 600px) {
+      .sidebar {
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        width: 70px;
+        min-width: 70px;
+        padding: 10px 0 0 0;
+        border-right: 1px solid #e0e0e0;
+        z-index: 100;
+        background: #f3f5ed;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+      .sidebar-link {
+        padding: 10px 0;
+        font-size: 0.95em;
+        width: 100%;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: 70px;
+        padding: 1rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+      <a href="index.html" class="sidebar-link">Home</a>
+      <a href="add-material.html" class="sidebar-link">Add Material</a>
+      <a href="product-price.html" class="sidebar-link">Product Price</a>
+  </aside>
+  <main class="main-content">
+    <h2 style="font-size:1.7rem;font-weight:700;margin-bottom:1.2rem;color:#234123;">Add Materials</h2>
+    <button onclick="window.location.href='add-material.html'" style="margin-bottom:1.5rem;padding:0.4rem 1.1rem;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#234123;font-weight:500;cursor:pointer;">← Back to Add Purchase</button>
+    <div id="materialsList" style="max-width:800px;margin:0 auto;"></div>
+  </main>
+  <script type="module" src="all-materials.js"></script>
+</body>
+</html>

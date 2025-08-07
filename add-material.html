@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Materials</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    @media (max-width: 900px) {
+      .sidebar { width: 120px; }
+      .main-content { margin-left: 130px; }
+    }
+    @media (max-width: 600px) {
+      .sidebar {
+        position: fixed;
+        left: 0; top: 0; bottom: 0;
+        width: 70px;
+        min-width: 70px;
+        padding: 10px 0 0 0;
+        border-right: 1px solid #e0e0e0;
+        z-index: 100;
+        background: #f3f5ed;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+      .sidebar-link {
+        padding: 10px 0;
+        font-size: 0.95em;
+        width: 100%;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: 70px;
+        padding: 1rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+      <a href="index.html" class="sidebar-link">Home</a>
+      <a href="add-material.html" class="sidebar-link active">Add Material</a>
+      <a href="product-price.html" class="sidebar-link">Product Price</a>
+  </aside>
+  <main class="main-content">
+    <h2 style="font-size:2rem;font-weight:700;margin-bottom:1.5rem;">Add Materials</h2>
+    <button onclick="window.location.href='all-materials.html'" style="margin-bottom:1.5rem;padding:0.5rem 1.2rem;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#234123;font-weight:500;cursor:pointer;">All Purchases</button>
+    <form id="materialForm" class="form-card card" style="max-width:500px;margin:0 auto;">
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">Material</label>
+        <input name="material" required placeholder="Enter Material Name" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">Dealer</label>
+        <input name="dealer" required placeholder="Enter name of the dealer" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">Quantity</label>
+        <input name="quantity" type="number" min="1" required placeholder="Enter Quantity" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">Price/Kg</label>
+        <input name="pricePerKg" type="number" min="0" required placeholder="Price per kg" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">Price</label>
+        <input name="price" type="number" min="0" required placeholder="Price" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label style="font-weight:600;">GST Amount</label>
+        <input name="gst" type="number" min="0" required placeholder="Enter GST Amount" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <label style="font-weight:600;">Hamali</label>
+        <input name="hamali" type="number" min="0" required placeholder="Enter Hamali Amount" style="width:100%;margin-top:0.5rem;">
+      </div>
+      <button class="btn" type="submit" style="width:100%;">+ Add Purchase</button>
+    </form>
+    <div id="addMaterialMsg" style="max-width:500px;margin:1rem auto 0 auto;"></div>
+  </main>
+  <script type="module" src="add-material.js"></script>
+  <script>
+    // Show mobile nav if on small screen
+    function updateMobileNav() {
+      var nav = document.querySelector('.mobile-nav');
+      if(window.innerWidth <= 600) nav.style.display = 'flex';
+      else nav.style.display = 'none';
+    }
+    window.addEventListener('resize', updateMobileNav);
+    updateMobileNav();
+  </script>
+</body>
+</html>
