@@ -6,6 +6,7 @@
   <title>Add Materials</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    /* Sidebar and main-content responsiveness */
     @media (max-width: 900px) {
       .sidebar { width: 120px; }
       .main-content { margin-left: 130px; }
@@ -36,6 +37,88 @@
         padding: 1rem 0.5rem;
       }
     }
+
+    /* Form responsiveness */
+    .form-card,
+    .card,
+    #materialForm {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      border-radius: 8px;
+      box-sizing: border-box;
+      padding: 1rem 1.5rem;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(38, 58, 74, 0.04);
+    }
+    #addMaterialMsg {
+      width: 100%;
+      max-width: 500px;
+      margin: 1rem auto 0 auto;
+      box-sizing: border-box;
+      padding: 0.5rem 1.5rem;
+    }
+    .form-card label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .form-card input {
+      width: 100%;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+    }
+    .form-card button.btn {
+      width: 100%;
+      padding: 0.75rem 0;
+      font-size: 1.05rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: #306233;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top:0.5rem;
+      transition: background 0.2s;
+    }
+    .form-card button.btn:hover {
+      background: #234123;
+    }
+
+    /* Message styling */
+    .message-success { color: #286d42; background: #e6f7e7; border-left: 4px solid #286d42; padding: 0.75em 1em;}
+    .message-error { color: #872a2a; background: #f9e6e7; border-left: 4px solid #872a2a; padding: 0.75em 1em;}
+    .hidden { display: none; }
+
+    /* Mobile-specific overrides */
+    @media (max-width: 600px) {
+      .form-card,
+      .card,
+      #materialForm {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-radius: 0px !important;
+        box-sizing: border-box;
+        padding: 1rem 0.5rem !important;
+      }
+      #addMaterialMsg {
+        max-width: 100vw !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box;
+        padding: 0 0.5rem;
+      }
+      .main-content {
+        padding: 1rem 0.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -47,46 +130,48 @@
   <main class="main-content">
     <h2 style="font-size:2rem;font-weight:700;margin-bottom:1.5rem;">Add Materials</h2>
     <button onclick="window.location.href='all-materials.html'" style="margin-bottom:1.5rem;padding:0.5rem 1.2rem;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#234123;font-weight:500;cursor:pointer;">All Purchases</button>
-    <form id="materialForm" class="form-card card" style="max-width:500px;margin:0 auto;">
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">Material</label>
-        <input name="material" required placeholder="Enter Material Name" style="width:100%;margin-top:0.5rem;">
+    <form id="materialForm" class="form-card card">
+      <div>
+        <label for="material">Material</label>
+        <input name="material" id="material" required placeholder="Enter Material Name">
       </div>
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">Dealer</label>
-        <input name="dealer" required placeholder="Enter name of the dealer" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="dealer">Dealer</label>
+        <input name="dealer" id="dealer" required placeholder="Enter name of the dealer">
       </div>
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">Quantity</label>
-        <input name="quantity" type="number" min="1" required placeholder="Enter Quantity" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="quantity">Quantity</label>
+        <input name="quantity" id="quantity" type="number" min="1" required placeholder="Enter Quantity">
       </div>
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">Price/Kg</label>
-        <input name="pricePerKg" type="number" min="0" required placeholder="Price per kg" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="pricePerKg">Price/Kg</label>
+        <input name="pricePerKg" id="pricePerKg" type="number" min="0" required placeholder="Price per kg">
       </div>
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">Price</label>
-        <input name="price" type="number" min="0" required placeholder="Price" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="price">Price</label>
+        <input name="price" id="price" type="number" min="0" required placeholder="Price">
       </div>
-      <div style="margin-bottom:1rem;">
-        <label style="font-weight:600;">GST Amount</label>
-        <input name="gst" type="number" min="0" required placeholder="Enter GST Amount" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="gst">GST Amount</label>
+        <input name="gst" id="gst" type="number" min="0" required placeholder="Enter GST Amount">
       </div>
-      <div style="margin-bottom:1.5rem;">
-        <label style="font-weight:600;">Hamali</label>
-        <input name="hamali" type="number" min="0" required placeholder="Enter Hamali Amount" style="width:100%;margin-top:0.5rem;">
+      <div>
+        <label for="hamali">Hamali</label>
+        <input name="hamali" id="hamali" type="number" min="0" required placeholder="Enter Hamali Amount">
       </div>
-      <button class="btn" type="submit" style="width:100%;">+ Add Purchase</button>
+      <button class="btn" type="submit">+ Add Purchase</button>
     </form>
-    <div id="addMaterialMsg" style="max-width:500px;margin:1rem auto 0 auto;"></div>
+    <div id="addMaterialMsg" class="hidden"></div>
   </main>
   <script type="module" src="add-material.js"></script>
   <script>
-    // Show mobile nav if on small screen
+    // OPTIONAL: Hide/Show mobile nav (if used elsewhere)
     function updateMobileNav() {
       var nav = document.querySelector('.mobile-nav');
-      if(window.innerWidth <= 600) nav.style.display = 'flex';
-      else nav.style.display = 'none';
+      if(nav) {
+        if(window.innerWidth <= 600) nav.style.display = 'flex';
+        else nav.style.display = 'none';
+      }
     }
     window.addEventListener('resize', updateMobileNav);
     updateMobileNav();
