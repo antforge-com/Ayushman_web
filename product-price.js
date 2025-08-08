@@ -4,22 +4,18 @@ import { db, auth } from './firebase-config.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-
 const materialRowsDiv = document.getElementById('materialRows');
 let materialRows = []; // Stores the current rows for material selection
 let materials = []; // Stores all materials fetched from Firestore
 
-// Status elements removed
-
 /**
- * Displays a status message to the user (currently disabled).
+ * Displays a status message to the user (currently disabled except error logs).
  * @param {string} message - The message to display.
  * @param {string} type - 'success', 'error', or 'loading'.
  */
 function displayStatus(message, type) {
-    // Only log errors to console
     if (type === 'error') {
-        console.log(`[Error] ${message}`);
+        console.error(`[Error] ${message}`);
     }
 }
 
@@ -27,27 +23,22 @@ function displayStatus(message, type) {
  * Fetches all materials from Firestore.
  */
 async function fetchMaterials() {
-    console.log('fetchMaterials: Attempting to fetch materials...'); // Added log
+    console.log('fetchMaterials: Attempting to fetch materials...');
     try {
-        // Fetch from flat 'materials' collection (not nested)
         const materialsCollectionRef = collection(db, "materials");
-        console.log('fetchMaterials: Querying Firestore collection "materials"...'); // Added log
         const materialsSnap = await getDocs(materialsCollectionRef);
-        console.log('fetchMaterials: Firestore query completed.'); // Added log
+        console.log('fetchMaterials: Firestore query completed.');
 
         materials = [];
         materialsSnap.forEach(doc => materials.push({ id: doc.id, ...doc.data() }));
 
-        // Debug: log loaded materials
-        console.log('Loaded materials:', materials); // Added log: Check this array in console!
+        console.log('Loaded materials:', materials);
 
-        // Client-side sorting by material name (try 'material' or fallback to 'materialName')
+        // Sort materials by name or fallback key
         materials.sort((a, b) => ((a.material || a.materialName || '').localeCompare(b.material || b.materialName || '')));
 
         if (materials.length === 0) {
             displayStatus('No materials found in the database. Please add materials first.', 'error');
-            console.log('fetchMaterials: No materials found in database.'); // Added log
-            // Show a visible error message in the UI
             let errorDiv = document.getElementById('materialErrorMsg');
             if (!errorDiv) {
                 errorDiv = document.createElement('div');
@@ -63,22 +54,18 @@ async function fetchMaterials() {
             }
             errorDiv.textContent = 'No materials found in the database. Please add materials first.';
         } else {
-            // Remove error message if present
             let errorDiv = document.getElementById('materialErrorMsg');
             if (errorDiv) errorDiv.remove();
-            console.log(`fetchMaterials: Successfully loaded ${materials.length} materials.`); // Added log
         }
 
-        // Add an initial row if none exist and render
+        // Initialize rows if empty
         if (materialRows.length === 0) {
             materialRows.push({ materialId: '', costPerKg: 0, quantity: 0, totalCost: 0 });
         }
-        console.log('fetchMaterials: Calling renderRows()...'); // Added log
-        renderRows(); // Render rows after materials are fetched
+        renderRows();
     } catch (err) {
         console.error("Error fetching materials for calculator:", err);
         displayStatus(`Error fetching materials: ${err.message}`, 'error');
-        // Show a visible error message in the UI
         let errorDiv = document.getElementById('materialErrorMsg');
         if (!errorDiv) {
             errorDiv = document.createElement('div');
@@ -100,7 +87,6 @@ async function fetchMaterials() {
  * Renders the material input rows on the page.
  */
 function renderRows() {
-    console.log('renderRows: Rendering material rows...'); // Added log
     materialRowsDiv.innerHTML = materialRows.map((row, idx) => `
         <tr style="border-bottom:1px solid #eee;">
             <td style="padding:0.75rem 0.5rem;">
@@ -113,7 +99,7 @@ function renderRows() {
                 <input class="qtyInput" data-idx="${idx}" type="number" min="0" step="0.01" value="${row.quantity || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
             </td>
             <td style="padding:0.75rem 0.5rem;text-align:center;">
-                <input class="costInput" data-idx="${idx}" type="number" min="0" step="0.01" value="${row.costPerKg || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+                <input class="costInput" data-idx="${idx}" type="number" min="0" step="0.01" value="${row.costPerKg || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;" disabled>
             </td>
             <td style="padding:0.75rem 0.5rem;text-align:center;">
                 ₹${(row.totalCost || 0).toFixed(2)}
@@ -124,17 +110,15 @@ function renderRows() {
         </tr>
     `).join('');
 
-    // Attach event listeners to newly rendered elements
+    // Attach event listeners
     document.querySelectorAll('.materialSelect').forEach(sel => sel.onchange = onRowChange);
-    document.querySelectorAll('.costInput').forEach(inp => inp.oninput = onRowChange);
     document.querySelectorAll('.qtyInput').forEach(inp => inp.oninput = onRowChange);
 
-    updateTotals(); // Update totals after rendering rows
-    console.log('renderRows: Rendering complete.'); // Added log
+    updateTotals();
 }
 
 /**
- * Handles changes in material row inputs (select, cost, quantity).
+ * Handles changes in material row inputs (select, quantity).
  * @param {Event} e - The change event.
  */
 function onRowChange(e) {
@@ -144,23 +128,29 @@ function onRowChange(e) {
     if (e.target.classList.contains('materialSelect')) {
         row.materialId = e.target.value;
         const mat = materials.find(m => m.id === row.materialId);
+
         if (mat) {
-            // Use the correct field for cost per kg (pricePerKg)
-            row.costPerKg = mat.pricePerKg || 0;
+            // Calculate inclusive cost per kg = total / quantity
+            if (mat.quantity && mat.total) {
+                row.costPerKg = mat.total / mat.quantity;
+            } else {
+                row.costPerKg = mat.pricePerKg || 0;
+            }
         } else {
-            row.costPerKg = 0; // Clear if no material selected
+            row.costPerKg = 0;
         }
     }
-    if (e.target.classList.contains('costInput')) row.costPerKg = +e.target.value;
-    if (e.target.classList.contains('qtyInput')) row.quantity = +e.target.value;
+    if (e.target.classList.contains('qtyInput')) {
+        row.quantity = +e.target.value;
+    }
 
     row.totalCost = (row.costPerKg || 0) * (row.quantity || 0);
-    renderRows(); // Re-render to update total cost for the row
+    renderRows();  // Re-render rows including totals
 }
 
 /**
  * Removes a material row.
- * @param {number} idx - The index of the row to remove.
+ * @param {number} idx - Index of the row to remove.
  */
 window.removeRow = function(idx) {
     materialRows.splice(idx, 1);
@@ -168,10 +158,10 @@ window.removeRow = function(idx) {
 };
 
 /**
- * Updates the total material cost, total bottle cost, and overall total cost.
+ * Updates the total costs shown on the page.
  */
 function updateTotals() {
-    let totalMaterial = materialRows.reduce((sum, r) => sum + (r.totalCost || 0), 0);
+    const totalMaterial = materialRows.reduce((sum, r) => sum + (r.totalCost || 0), 0);
     document.getElementById('totalMaterialCost').textContent = `₹${totalMaterial.toFixed(2)}`;
 
     const numBottles = +document.getElementById('numBottles').value;
@@ -183,24 +173,23 @@ function updateTotals() {
     document.getElementById('totalCost').textContent = `₹${overallTotalCost.toFixed(2)}`;
 }
 
-// Event listener for adding a new material row
+// Add new material row button
 document.getElementById('addRowBtn').onclick = () => {
     materialRows.push({ materialId: '', costPerKg: 0, quantity: 0, totalCost: 0 });
     renderRows();
 };
 
-// Event listeners for bottle inputs to update totals dynamically
+// Update totals when bottle info changes
 document.getElementById('numBottles').oninput = updateTotals;
 document.getElementById('costPerBottle').oninput = updateTotals;
 
-// Event listener for the "Calculate Product Price" button
+// Calculate pricing on button click
 document.getElementById('calcBtn').onclick = () => {
     const totalMaterial = materialRows.reduce((sum, r) => sum + (r.totalCost || 0), 0);
     const numBottles = +document.getElementById('numBottles').value;
     const costPerBottle = +document.getElementById('costPerBottle').value;
 
     const pricingResultsDiv = document.getElementById('pricingResults');
-
     if (numBottles <= 0) {
         pricingResultsDiv.style.display = 'block';
         pricingResultsDiv.innerHTML = `
@@ -214,16 +203,14 @@ document.getElementById('calcBtn').onclick = () => {
     const bottleCost = numBottles * costPerBottle;
     const baseCost = totalMaterial + bottleCost;
 
-    // Calculation logic for margins and total selling price
-    const margin1 = baseCost * 1.13; // 113% margin on base cost
-    const margin2 = (baseCost + margin1) * 0.12; // 12% margin on (baseCost + margin1)
+    // Your margin calculations
+    const margin1 = baseCost * 1.13;              // 113% margin on base cost
+    const margin2 = (baseCost + margin1) * 0.12;  // 12% margin on (baseCost + margin1)
     const totalSellingPrice = baseCost + margin1 + margin2;
     const grossPerBottle = totalSellingPrice / numBottles;
 
-    // Show the pricing results div
     pricingResultsDiv.style.display = 'block';
-    
-    // Update the result fields
+
     document.getElementById('resultBasePrice').textContent = `₹${baseCost.toFixed(2)}`;
     document.getElementById('resultMargin1').textContent = `₹${margin1.toFixed(2)}`;
     document.getElementById('resultMargin2').textContent = `₹${margin2.toFixed(2)}`;
@@ -231,18 +218,14 @@ document.getElementById('calcBtn').onclick = () => {
     document.getElementById('resultPricePerBottle').textContent = `₹${grossPerBottle.toFixed(2)}`;
 };
 
-// Listen for the DOM to be fully loaded before trying to fetch materials
+// On DOM load, wait for Firebase auth then fetch materials
 document.addEventListener('DOMContentLoaded', () => {
-    // Listen for authentication state changes
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, user => {
         if (user) {
-            console.log('onAuthStateChanged: User is signed in. Fetching materials...'); // Added log
-            // User is signed in, fetch materials
+            console.log('User signed in, fetching materials...');
             fetchMaterials();
         } else {
-            // User is signed out or not yet signed in.
-            // firebase-config.js handles anonymous sign-in, so this should eventually resolve.
-            console.log('onAuthStateChanged: User is not signed in. Waiting for authentication...'); // Added log
+            console.log('User not signed in yet.');
         }
     });
 });

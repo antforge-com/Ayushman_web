@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             addMaterialMsg.classList.add('hidden'); // Hide previous messages
 
-            // Ensure Firebase Auth is ready before proceeding
+            // Confirm authentication
             if (!auth.currentUser) {
                 addMaterialMsg.textContent = "Error: Authentication not ready. Please try again.";
                 addMaterialMsg.classList.remove('hidden', 'message-success');
@@ -31,13 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            try {
-                // Add a field to store the user ID, useful for Firestore security rules
-                // If you're using public data, you might not need this for writes,
-                // but it's good practice for user-specific data.
-                data.userId = auth.currentUser.uid;
+            // Calculate total cost including GST, Hamali, and Price
+            const price = data.price || 0;
+            const gst = data.gst || 0;
+            const hamali = data.hamali || 0;
+            data.total = price + gst + hamali;
 
+            // Add current user ID
+            data.userId = auth.currentUser.uid;
+
+            try {
+                console.log("Saving material document:", data); // Debug log
                 await addDoc(collection(db, "materials"), data);
+
                 addMaterialMsg.textContent = "Material added successfully!";
                 addMaterialMsg.classList.remove('hidden', 'message-error');
                 addMaterialMsg.classList.add('message-success');
