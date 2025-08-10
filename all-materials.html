@@ -2,111 +2,205 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>All Materials</title>
-  <link rel="stylesheet" href="styles.css">
   <style>
-    /* Sidebar styles */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 150px;
-      padding: 20px 0;
-      border-right: 1px solid #e0e0e0;
-      background: #f3f5ed;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .sidebar-link {
-      padding: 10px 0;
-      font-size: 1em;
-      width: 100%;
-      text-align: center;
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #f8faf8;
       color: #234123;
+    }
+
+    /* Navbar */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background-color: #234123;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .hamburger-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      color: white;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .navbar-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      text-align: center;
+      flex-grow: 1;
+    }
+
+    /* Sidebar Drawer */
+    .drawer {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #f3f5ed;
+      overflow-x: hidden;
+      transition: 0.3s ease;
+      padding-top: 60px;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+      z-index: 2000;
+    }
+
+    .drawer a {
+      padding: 12px 20px;
       text-decoration: none;
-      font-weight: 500;
+      font-size: 1rem;
+      color: #234123;
+      display: block;
+      transition: 0.2s;
     }
 
-    .sidebar-link:hover {
-      background-color: #e0e0e0;
+    .drawer a:hover {
+      background-color: #e9efe9;
+      padding-left: 25px;
     }
 
-    /* Main content */
-    .main-content {
-      position: relative;
-      margin-left: 160px;
-      padding: 1rem 2rem;
-    }
-
-    /* Corner logo */
-    .corner-logo {
+    .drawer .close-btn {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 60px;
-      height: auto;
-      z-index: 50;
+      top: 15px;
+      right: 20px;
+      font-size: 1.8rem;
+      color: #234123;
+      cursor: pointer;
     }
 
-    /* Responsive tweaks */
-    @media (max-width: 900px) {
-      .sidebar {
-        width: 120px;
-      }
+    /* Main Content */
+    .main-content {
+      padding: 1.5rem;
+      max-width: 1200px;
+      margin: auto;
+    }
 
-      .main-content {
-        margin-left: 130px;
-      }
+    .main-content h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Materials List */
+    #materialsList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .material-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .material-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .material-title {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #234123;
+    }
+
+    .material-details {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .no-materials {
+      grid-column: 1 / -1;
+      text-align: center;
+      font-size: 1rem;
+      color: #777;
+      padding: 2rem 0;
     }
 
     @media (max-width: 600px) {
-      .sidebar {
-        top: 0;
-        width: 70px;
-        min-width: 70px;
-        padding: 10px 0 0 0;
+      .navbar-title {
+        font-size: 1rem;
       }
 
-      .sidebar-link {
-        font-size: 0.95em;
-      }
-
-      .main-content {
-        margin-left: 70px;
-        padding: 1rem 0.5rem;
-      }
-
-      .corner-logo {
-        top: 5px;
-        right: 5px;
-        width: 50px;
+      .main-content h2 {
+        font-size: 1.25rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <aside class="sidebar">
-    <a href="index.html" class="sidebar-link">Home</a>
-    <a href="add-material.html" class="sidebar-link">Add Material</a>
-    <a href="product-price.html" class="sidebar-link">Product Price</a>
-  </aside>
+  <!-- Navbar -->
+  <div class="navbar">
+    <button class="hamburger-btn" onclick="openDrawer()">☰</button>
+    <div class="navbar-title">All Materials</div>
+  </div>
 
-  <main class="main-content">
-    <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" class="corner-logo">
+  <!-- Drawer -->
+  <div id="drawer" class="drawer">
+    <span class="close-btn" onclick="closeDrawer()">&times;</span>
+    <a href="index.html">Home</a>
+    <a href="add-material.html">Add Material</a>
+    <a href="product-price.html">Product Price</a>
+  </div>
 
-    <h2 style="font-size:1.7rem;font-weight:700;margin-bottom:1.2rem;color:#234123;">Add Materials</h2>
-    <button onclick="window.location.href='add-material.html'"
-      style="margin-bottom:1.5rem;padding:0.4rem 1.1rem;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#234123;font-weight:500;cursor:pointer;">←
-      Back to Add Purchase</button>
-    <div id="materialsList" style="max-width:800px;margin:0 auto;"></div>
-  </main>
+  <!-- Main -->
+  <div class="main-content">
+    <h2>Materials List</h2>
+    <div id="materialsList">
+      <div id="noMaterialsMsg" class="no-materials">
+        No materials found.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openDrawer() {
+      document.getElementById("drawer").style.width = "250px";
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawer").style.width = "0";
+    }
+
+    // Example: Remove "No materials found" when items are loaded
+    function addMaterialCard(name, dealer, price) {
+      const list = document.getElementById("materialsList");
+      const noMsg = document.getElementById("noMaterialsMsg");
+      if (noMsg) noMsg.remove();
+
+      const card = document.createElement("div");
+      card.className = "material-card";
+      card.innerHTML = `
+        <div class="material-title">${name}</div>
+        <div class="material-details">Dealer: ${dealer}</div>
+        <div class="material-details">Price: ₹${price}</div>
+      `;
+      list.appendChild(card);
+    }
+
+    // Example: dynamically adding one material
+    // addMaterialCard("Onion", "Local Market", "50/kg");
+  </script>
+
   <script type="module" src="all-materials.js"></script>
 </body>
+
 </html>

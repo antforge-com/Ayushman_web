@@ -3,20 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#234123">
   <meta name="description" content="Material management and product price calculation app">
   <title>Home - Product App</title>
-
-  <!-- PWA / Icons -->
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Product App">
-
-  <link rel="stylesheet" href="styles.css">
 
   <style>
     :root {
@@ -28,32 +19,32 @@
       --text: #1f2937;
       --muted: #6b7280;
       --border: #e5e7eb;
-      --shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
       --radius: 14px;
     }
 
-    /* Base */
     * {
-      box-sizing: border-box
+      box-sizing: border-box;
+      transition: all 0.2s ease;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     a {
       color: inherit;
-      text-decoration: none
+      text-decoration: none;
     }
 
     img {
       display: block;
-      max-width: 100%
+      max-width: 100%;
     }
 
     /* Top bar */
@@ -62,7 +53,7 @@
       inset: 0 0 auto 0;
       height: 64px;
       background: #f3f5ed;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 12px;
@@ -73,10 +64,10 @@
     .hamburger-btn {
       width: 42px;
       height: 42px;
-      border: none;
       background: transparent;
+      border: none;
       border-radius: 8px;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
@@ -87,7 +78,6 @@
       height: 2px;
       background: var(--primary);
       position: relative;
-      display: block;
     }
 
     .hamburger::before,
@@ -100,29 +90,11 @@
       background: var(--primary);
     }
 
-    .hamburger::before {
-      top: -7px;
-    }
-
-    .hamburger::after {
-      top: 7px;
-    }
-
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .hamburger::before { top: -7px; }
+    .hamburger::after { top: 7px; }
 
     .brand-wrap img {
       height: 34px;
-      width: auto
-    }
-
-    .brand-title {
-      font-weight: 700;
-      letter-spacing: .2px;
-      color: var(--primary)
     }
 
     /* Drawer */
@@ -133,9 +105,9 @@
       bottom: 0;
       width: 260px;
       background: #f3f5ed;
-      border-right: 1px solid #e0e0e0;
+      border-right: 1px solid var(--border);
       transform: translateX(-100%);
-      transition: transform .25s ease;
+      transition: transform 0.3s ease;
       z-index: 300;
       padding: 78px 0 12px;
       display: flex;
@@ -160,9 +132,9 @@
     .drawer-link {
       padding: 12px 18px;
       font-size: 1rem;
-      color: var(--primary);
       font-weight: 600;
       border-left: 4px solid transparent;
+      color: var(--primary);
     }
 
     .drawer-link:hover {
@@ -180,7 +152,7 @@
       background: rgba(0, 0, 0, 0.28);
       opacity: 0;
       visibility: hidden;
-      transition: opacity .2s ease, visibility .2s ease;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
       z-index: 250;
     }
 
@@ -192,19 +164,15 @@
     /* Main layout */
     .main {
       padding: 84px 24px 32px;
-      /* account for topbar */
       max-width: 1200px;
       margin: 0 auto;
     }
 
     /* Hero */
     .hero {
-      position: relative;
       border-radius: var(--radius);
-      overflow: hidden;
-      background: radial-gradient(1200px 600px at 10% -10%, #9be7b0 0%, rgba(155, 231, 176, 0) 55%),
-        radial-gradient(1000px 500px at 90% -20%, #cfe9d6 0%, rgba(207, 233, 214, 0) 55%),
-        linear-gradient(135deg, #f7fbf8 0%, #ebf3ee 100%);
+      background: radial-gradient(1000px 500px at 10% -10%, #9be7b0 0%, transparent 55%),
+                  linear-gradient(135deg, #f7fbf8, #ebf3ee);
       border: 1px solid var(--border);
       box-shadow: var(--shadow);
       padding: 28px;
@@ -216,7 +184,6 @@
 
     .hero-content h1 {
       font-size: clamp(1.6rem, 2.8vw, 2.2rem);
-      line-height: 1.2;
       margin: 0 0 10px;
       color: var(--primary);
       font-weight: 800;
@@ -237,22 +204,20 @@
     .btn {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
-      padding: .72rem 1rem;
+      padding: 0.72rem 1rem;
       border-radius: 10px;
       border: 1px solid #cfd8cf;
       background: #fff;
       color: #111;
       font-weight: 600;
       cursor: pointer;
-      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
     }
 
     .btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
     }
 
     .btn-primary {
@@ -265,61 +230,72 @@
       background: var(--primary-600);
     }
 
-    .hero-art {
-      position: relative;
-      height: 100%;
+    /* Updated top-right brand card */
+    .hero-art.updated-top-box {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-start;
       min-height: 180px;
-      border-radius: 16px;
-      background:
-        radial-gradient(200px 160px at 80% 20%, rgba(124, 197, 143, .35), transparent 70%),
-        radial-gradient(220px 140px at 20% 80%, rgba(35, 65, 35, .15), transparent 60%),
-        linear-gradient(160deg, #ffffff 0%, #f5faf7 100%);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
 
-    .hero-badge {
-      position: absolute;
-      top: 14px;
-      right: 14px;
+    .brand-card {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: #ffffffcc;
-      backdrop-filter: blur(6px);
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      font-weight: 600;
+      gap: 14px;
+      background: rgba(255,255,255,0.75);
+      box-shadow: 0 4px 24px rgba(124, 197, 143, 0.10),
+                  0 1.5px 30px rgba(35,65,35,0.08);
+      border-radius: 18px;
+      padding: 14px 20px;
+      backdrop-filter: blur(10px);
+      border: 1.5px solid var(--border);
+    }
+
+    .brand-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(124,197,143,0.17);
+      background: #fff;
+      object-fit: contain;
+      border: 2px solid #e8f3ea;
+    }
+
+    .brand-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-weight: 700;
       color: var(--primary);
-      font-size: .9rem;
+      font-size: 1rem;
     }
 
-    .hero-art img {
-      width: 68px;
-      opacity: .95
+    .brand-status {
+      font-size: 0.85rem;
+      color: var(--muted);
+      opacity: 0.75;
     }
 
-    /* Quick actions grid */
+    /* Quick actions */
     .section-title {
       margin: 26px 2px 14px;
       font-size: 1.1rem;
       font-weight: 800;
       color: var(--primary);
-      letter-spacing: .2px;
     }
 
     .grid {
       display: grid;
       gap: 18px;
-      grid-template-columns: repeat(12, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     }
 
     .card {
-      grid-column: span 4;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -328,13 +304,11 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      transition: transform .08s ease, box-shadow .2s ease, border-color .2s ease;
     }
 
     .card:hover {
       transform: translateY(-2px);
       box-shadow: 0 18px 38px rgba(0, 0, 0, 0.08);
-      border-color: #dfe6df;
     }
 
     .card-head {
@@ -353,103 +327,75 @@
       font-size: 1.2rem;
     }
 
-    .icon-green {
-      background: linear-gradient(135deg, #2d6a4f, #3a7f5c);
-    }
-
-    .icon-blue {
-      background: linear-gradient(135deg, #2563eb, #3b82f6);
-    }
-
-    .icon-amber {
-      background: linear-gradient(135deg, #b45309, #f59e0b);
-    }
-
-    .card h3 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
-    .card .actions {
-      margin-top: auto;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .icon-green { background: linear-gradient(135deg, #2d6a4f, #3a7f5c); }
+    .icon-blue { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+    .icon-amber { background: linear-gradient(135deg, #b45309, #f59e0b); }
 
     .link-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: .55rem .8rem;
+      padding: 0.55rem 0.8rem;
       border-radius: 9px;
       border: 1px solid #e5e7eb;
       background: #fafafa;
       font-weight: 600;
-      color: #111;
     }
 
     .link-btn:hover {
       background: #f2f2f2;
     }
 
-    /* Responsive grid spans */
-    @media (max-width: 1024px) {
-      .card {
-        grid-column: span 6;
-      }
-
+    /* MOBILE IMPROVEMENTS */
+    @media (max-width: 768px) {
       .hero {
         grid-template-columns: 1fr;
+        text-align: center;
+        gap: 20px;
       }
-    }
-
-    @media (max-width: 640px) {
+      .hero-content p {
+        font-size: 1rem;
+      }
+      .hero-cta {
+        justify-content: center;
+      }
+      .hero-art.updated-top-box {
+        justify-content: center;
+      }
+      .brand-card {
+        padding: 12px 16px;
+        gap: 10px;
+      }
+      .brand-name {
+        font-size: 0.95rem;
+      }
+      .brand-avatar {
+        width: 48px;
+        height: 48px;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
       .main {
-        padding: 84px 14px 24px;
-      }
-
-      .card {
-        grid-column: span 12;
-      }
-
-      .drawer {
-        width: 80vw;
-      }
-
-      .hero {
-        padding: 20px
-      }
-
-      .hero-badge {
-        top: 10px;
-        right: 10px;
+        padding: 80px 14px 24px;
       }
     }
   </style>
 </head>
 
 <body>
-  <!-- Top bar with hamburger + brand -->
-  <header class="topbar" role="banner">
-    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-controls="drawerNav"
-      aria-expanded="false">
-      <span class="hamburger" aria-hidden="true"></span>
+  <!-- Top bar -->
+  <header class="topbar">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation">
+      <span class="hamburger"></span>
     </button>
     <div class="brand-wrap">
       <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo">
-      <div class="brand-title">Vasavi Ayurveda</div>
     </div>
   </header>
 
-  <!-- Drawer navigation -->
-  <nav class="drawer" id="drawerNav" aria-hidden="true">
+  <!-- Drawer -->
+  <nav class="drawer" id="drawerNav">
     <div class="drawer-logo">
       <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo">
     </div>
@@ -459,7 +405,6 @@
     <a href="all-materials.html" class="drawer-link">All Purchases</a>
   </nav>
 
-  <!-- Backdrop -->
   <div class="backdrop" id="backdrop"></div>
 
   <!-- Main -->
@@ -468,40 +413,27 @@
     <section class="hero">
       <div class="hero-content">
         <h1>Run your materials and pricing with clarity</h1>
-        <p>Fast data entry, clean overviews, and accurate pricing — designed to work beautifully on mobile and desktop.
-        </p>
+        <p>Fast data entry, clean overviews, and accurate pricing — designed to work beautifully on mobile and desktop.</p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="add-material.html">+ Add Material</a>
           <a class="btn" href="all-materials.html">View Purchases</a>
           <a class="btn" href="product-price.html">Open Price Calculator</a>
         </div>
       </div>
-      <div class="hero-art">
-        <div class="hero-badge">
-          <img src="assets/vasavi-logo.png" alt="Logo" style="height:22px;width:auto;">
-          Vasavi Ayurveda
+
+      <div class="hero-art updated-top-box">
+        <div class="brand-card">
+          <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" class="brand-avatar" />
+          <div class="brand-info">
+            <span class="brand-name">Vasavi Ayurveda</span>
+          </div>
         </div>
-        <!-- Simple decorative SVG -->
-        <svg width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#7cc58f" stop-opacity="0.9" />
-              <stop offset="100%" stop-color="#cdebd5" stop-opacity="0.6" />
-            </linearGradient>
-          </defs>
-          <path d="M10 120 C 40 40, 120 40, 150 120" stroke="url(#g1)" stroke-width="10" stroke-linecap="round"
-            fill="none" />
-          <circle cx="60" cy="60" r="8" fill="#2d6a4f" opacity=".4" />
-          <circle cx="170" cy="90" r="10" fill="#7cc58f" opacity=".6" />
-        </svg>
       </div>
     </section>
 
     <!-- Quick actions -->
     <h2 class="section-title">Quick actions</h2>
     <section class="grid">
-      <!-- Add Material -->
       <article class="card">
         <div class="card-head">
           <div class="card-icon icon-green">🌿</div>
@@ -516,7 +448,6 @@
         </div>
       </article>
 
-      <!-- Product Price -->
       <article class="card">
         <div class="card-head">
           <div class="card-icon icon-blue">🧮</div>
@@ -530,7 +461,6 @@
         </div>
       </article>
 
-      <!-- Recent Activity -->
       <article class="card">
         <div class="card-head">
           <div class="card-icon icon-amber">📦</div>
@@ -546,11 +476,10 @@
     </section>
   </main>
 
-  <!-- Firebase (unchanged) -->
+  <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyA-iSMXwphhv_A2cioqul2Ov_7FNFGuNYE",
       authDomain: "new-one-a7334.firebaseapp.com",
@@ -564,7 +493,6 @@
     try {
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
-      // Touch Firestore to confirm connectivity (non-blocking)
       getDocs(collection(db, "materials")).catch(console.error);
     } catch (err) {
       console.error("Firebase initialization error:", err);
@@ -577,25 +505,16 @@
       const btn = document.getElementById('hamburgerBtn');
       const drawer = document.getElementById('drawerNav');
       const backdrop = document.getElementById('backdrop');
-
       function openDrawer() {
         drawer.classList.add('open');
         backdrop.classList.add('open');
-        drawer.setAttribute('aria-hidden', 'false');
-        btn.setAttribute('aria-expanded', 'true');
-        const firstLink = drawer.querySelector('a');
-        if (firstLink) firstLink.focus({ preventScroll: true });
         document.body.style.overflow = 'hidden';
       }
       function closeDrawer() {
         drawer.classList.remove('open');
         backdrop.classList.remove('open');
-        drawer.setAttribute('aria-hidden', 'true');
-        btn.setAttribute('aria-expanded', 'false');
-        btn.focus({ preventScroll: true });
         document.body.style.overflow = '';
       }
-
       btn.addEventListener('click', () => {
         drawer.classList.contains('open') ? closeDrawer() : openDrawer();
       });
@@ -608,6 +527,5 @@
       });
     })();
   </script>
-
 </body>
 </html>

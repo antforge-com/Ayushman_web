@@ -5,22 +5,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Materials</title>
-  <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Top bar (replaces sidebar) */
+    :root {
+      --primary: #2f5d34;
+      --primary-dark: #234123;
+      --bg-light: #f6f8f3;
+      --border: #dcdcdc;
+      --radius: 8px;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg-light);
+      color: #222;
+    }
+
+    /* Top bar */
     .topbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       height: 56px;
-      background: #f3f5ed;
-      border-bottom: 1px solid #e0e0e0;
+      background: white;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 0 12px;
+      padding: 0 14px;
       z-index: 200;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
     }
 
     .hamburger-btn {
@@ -33,51 +48,48 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      transition: background 0.2s;
     }
 
-    .hamburger {
-      width: 22px;
-      height: 2px;
-      background: #234123;
-      position: relative;
-      display: block;
+    .hamburger-btn:hover {
+      background: rgba(47, 93, 52, 0.08);
     }
 
+    .hamburger,
     .hamburger::before,
     .hamburger::after {
       content: "";
-      position: absolute;
-      left: 0;
       width: 22px;
       height: 2px;
-      background: #234123;
+      background: var(--primary);
+      display: block;
+      border-radius: 1px;
+      transition: 0.25s;
     }
 
     .hamburger::before {
+      position: relative;
       top: -6px;
     }
 
     .hamburger::after {
-      top: 6px;
+      position: relative;
+      top: 4px;
     }
 
-    /* Slide-out drawer and backdrop */
+    /* Drawer */
     .drawer {
       position: fixed;
       top: 0;
       left: 0;
       bottom: 0;
       width: 240px;
-      background: #f3f5ed;
-      border-right: 1px solid #e0e0e0;
+      background: white;
+      border-right: 1px solid var(--border);
       transform: translateX(-100%);
       transition: transform 0.25s ease;
       z-index: 300;
-      padding: 70px 0 10px;
-      /* space for topbar */
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
+      padding-top: 70px;
     }
 
     .drawer.open {
@@ -87,37 +99,35 @@
     .drawer-logo {
       text-align: center;
       padding: 12px 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .drawer-logo img {
-      max-height: 60px;
-      width: auto;
+      border-bottom: 1px solid var(--border);
     }
 
     .drawer-link {
-      padding: 12px 18px;
+      display: block;
+      padding: 14px 18px;
       font-size: 1em;
-      color: #234123;
+      color: var(--primary);
       text-decoration: none;
-      font-weight: 500;
+      transition: background 0.2s, padding-left 0.2s;
     }
 
     .drawer-link:hover {
-      background-color: #e0e0e0;
+      background-color: #e9f3eb;
+      padding-left: 24px;
     }
 
     .drawer-link.active {
-      background-color: #e9efe9;
+      background-color: #dff0e0;
+      font-weight: bold;
     }
 
     .backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.28);
+      background: rgba(0, 0, 0, 0.3);
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
+      transition: opacity 0.2s ease;
       z-index: 250;
     }
 
@@ -126,256 +136,238 @@
       visibility: visible;
     }
 
-    /* Main content (no sidebar margin now) */
+    /* Main */
     .main-content {
-      position: relative;
-      padding: 72px 2rem 2rem;
-      /* top space for fixed topbar */
+      padding: 80px 1.5rem 2rem;
+      max-width: 700px;
+      margin: auto;
+      animation: fadeIn 0.3s ease;
     }
 
-    .corner-logo {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 60px;
-      height: auto;
-      z-index: 50;
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--primary-dark);
     }
 
-    @media (max-width: 900px) {
-      .main-content {
-        padding: 72px 1.5rem 1.5rem;
-      }
+    /* All Purchases Button */
+    .all-btn {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
     }
 
-    @media (max-width: 600px) {
-      .main-content {
-        padding: 68px 0.5rem 1rem;
-      }
-
-      .corner-logo {
-        top: 5px;
-        right: 5px;
-        width: 50px;
-      }
-
-      .drawer {
-        width: 78vw;
-      }
-
-      /* slimmer drawer on small screens */
+    .all-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
     }
 
-    /* Form responsiveness (from your original) */
-    .form-card,
-    .card,
-    #materialForm {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      border-radius: 8px;
-      box-sizing: border-box;
-      padding: 1rem 1.5rem;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(38, 58, 74, 0.04);
+    /* Form */
+    .form-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      animation: slideUp 0.3s ease;
     }
 
-    #addMaterialMsg {
-      width: 100%;
-      max-width: 500px;
-      margin: 1rem auto 0 auto;
-      box-sizing: border-box;
-      padding: 0.5rem 1.5rem;
-    }
-
-    .form-card label {
+    label {
       font-weight: 600;
       display: block;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
     }
 
-    .form-card input {
+    input,
+    select {
       width: 100%;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
+      padding: 0.6rem;
       font-size: 1rem;
-      box-sizing: border-box;
-      border-radius: 4px;
-      border: 1px solid #d1d5db;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47, 93, 52, 0.15);
     }
 
     .form-card button.btn {
       width: 100%;
-      padding: 0.75rem 0;
-      font-size: 1.05rem;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      background: #306233;
-      color: #fff;
-      font-weight: 600;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: bold;
       cursor: pointer;
-      margin-top: 0.5rem;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.15s;
     }
 
     .form-card button.btn:hover {
-      background: #234123;
+      background: var(--primary-dark);
+      transform: translateY(-1px);
     }
 
-    /* Message styling */
+    /* Messages */
     .message-success {
-      color: #286d42;
-      background: #e6f7e7;
-      border-left: 4px solid #286d42;
-      padding: 0.75em 1em;
+      color: #1d6936;
+      background: #e4f6e8;
+      border-left: 4px solid #1d6936;
+      padding: 0.75rem 1rem;
     }
 
     .message-error {
       color: #872a2a;
       background: #f9e6e7;
       border-left: 4px solid #872a2a;
-      padding: 0.75em 1em;
+      padding: 0.75rem 1rem;
     }
 
-    .hidden {
-      display: none;
-    }
-
-    /* Mobile-specific overrides */
-    @media (max-width: 600px) {
-
-      .form-card,
-      .card,
-      #materialForm {
-        max-width: 100vw !important;
-        width: 100vw !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        border-radius: 0px !important;
-        box-sizing: border-box;
-        padding: 1rem 0.5rem !important;
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
 
-      #addMaterialMsg {
-        max-width: 100vw !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        box-sizing: border-box;
-        padding: 0 0.5rem;
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .drawer {
+        width: 78vw;
+      }
+
+      h2 {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
+
 <body>
-  <!-- Top bar with hamburger and logo -->
-  <header class="topbar" role="banner">
-    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-controls="drawerNav"
-      aria-expanded="false">
-      <span class="hamburger" aria-hidden="true"></span>
+  <header class="topbar">
+    <button class="hamburger-btn" id="hamburgerBtn">
+      <span class="hamburger"></span>
     </button>
-    <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" style="height:36px; width:auto;">
+    <img src="assets/vasavi-logo.png" alt="Logo" style="height:36px;">
   </header>
 
-  <!-- Drawer navigation -->
-  <nav class="drawer" id="drawerNav" aria-hidden="true">
+  <nav class="drawer" id="drawerNav">
     <div class="drawer-logo">
-      <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo">
+      <img src="assets/vasavi-logo.png" alt="Logo" style="max-height:60px;">
     </div>
     <a href="index.html" class="drawer-link">Home</a>
     <a href="add-material.html" class="drawer-link active">Add Material</a>
     <a href="product-price.html" class="drawer-link">Product Price</a>
   </nav>
 
-  <!-- Backdrop -->
   <div class="backdrop" id="backdrop"></div>
 
   <main class="main-content">
-    <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" class="corner-logo">
+    <h2>Add Materials</h2>
+    <button class="all-btn" onclick="window.location.href='all-materials.html'">All Purchases</button>
 
-    <h2 style="font-size:2rem;font-weight:700;margin-bottom:1.5rem;">Add Materials</h2>
-    <button onclick="window.location.href='all-materials.html'"
-      style="margin-bottom:1.5rem;padding:0.5rem 1.2rem;border-radius:6px;border:1px solid #d1d5db;background:#fff;color:#234123;font-weight:500;cursor:pointer;">All
-      Purchases</button>
+    <form id="materialForm" class="form-card">
+      <label for="material">Material</label>
+      <input name="material" id="material" required placeholder="Enter Material Name">
 
-    <form id="materialForm" class="form-card card">
-      <div>
-        <label for="material">Material</label>
-        <input name="material" id="material" required placeholder="Enter Material Name">
+      <label for="dealer">Dealer</label>
+      <input name="dealer" id="dealer" required placeholder="Enter Dealer Name">
+
+      <div style="display:flex; gap:10px;">
+        <div style="flex:1;">
+          <label for="quantity">Quantity</label>
+          <input name="quantity" id="quantity" type="number" min="1" required placeholder="Enter Quantity">
+        </div>
+        <div style="width:100px;">
+          <label for="unit">Unit</label>
+          <select name="unit" id="unit">
+            <option value="kg">Kg</option>
+            <option value="gm">Gm</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label for="dealer">Dealer</label>
-        <input name="dealer" id="dealer" required placeholder="Enter name of the dealer">
-      </div>
-      <div>
-        <label for="quantity">Quantity</label>
-        <input name="quantity" id="quantity" type="number" min="1" required placeholder="Enter Quantity">
-      </div>
-      <div>
-        <label for="pricePerKg">Price/Kg</label>
-        <input name="pricePerKg" id="pricePerKg" type="number" min="0" required placeholder="Price per kg">
-      </div>
-      <div>
-        <input name="price" id="price" type="number" min="0" required placeholder="Price" readonly>
-      </div>
-      <div>
-        <label for="gst">GST Amount</label>
-        <input name="gst" id="gst" type="number" min="0" required placeholder="Enter GST Amount">
-      </div>
-      <div>
-        <label for="hamali">Hamali</label>
-        <input name="hamali" id="hamali" type="number" min="0" required placeholder="Enter Hamali Amount">
-      </div>
+
+      <label for="pricePerKg">Price</label>
+      <input name="pricePerKg" id="pricePerKg" type="number" min="0" required placeholder="Enter Price">
+
+      <input name="price" id="price" type="number" min="0" placeholder="Total Price" readonly>
+
+      <label for="gst">GST Amount</label>
+      <input name="gst" id="gst" type="number" min="0" required placeholder="Enter GST Amount">
+
+      <label for="hamali">Hamali</label>
+      <input name="hamali" id="hamali" type="number" min="0" required placeholder="Enter Hamali Amount">
+
       <button class="btn" type="submit">+ Add Purchase</button>
     </form>
 
     <div id="addMaterialMsg" class="hidden"></div>
   </main>
 
-  <!-- Your existing module (unchanged) -->
-  <script type="module" src="add-material.js"></script>
-     
-  <!-- Hamburger/drawer logic -->
   <script>
-    (function () {
-      const btn = document.getElementById('hamburgerBtn');
-      const drawer = document.getElementById('drawerNav');
-      const backdrop = document.getElementById('backdrop');
+    const btn = document.getElementById('hamburgerBtn');
+    const drawer = document.getElementById('drawerNav');
+    const backdrop = document.getElementById('backdrop');
 
-      function openDrawer() {
-        drawer.classList.add('open');
-        backdrop.classList.add('open');
-        drawer.setAttribute('aria-hidden', 'false');
-        btn.setAttribute('aria-expanded', 'true');
-        const firstLink = drawer.querySelector('a');
-        if (firstLink) firstLink.focus({ preventScroll: true });
-        document.body.style.overflow = 'hidden';
-      }
+    btn.addEventListener('click', () => {
+      drawer.classList.toggle('open');
+      backdrop.classList.toggle('open');
+    });
 
-      function closeDrawer() {
-        drawer.classList.remove('open');
-        backdrop.classList.remove('open');
-        drawer.setAttribute('aria-hidden', 'true');
-        btn.setAttribute('aria-expanded', 'false');
-        btn.focus({ preventScroll: true });
-        document.body.style.overflow = '';
-      }
+    backdrop.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+    });
 
-      btn.addEventListener('click', () => {
-        drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-      });
+    // Auto price calculation
+    const qty = document.getElementById('quantity');
+    const pricePerKg = document.getElementById('pricePerKg');
+    const unit = document.getElementById('unit');
+    const totalPrice = document.getElementById('price');
 
-      backdrop.addEventListener('click', closeDrawer);
+    function calc() {
+      const q = parseFloat(qty.value) || 0;
+      const p = parseFloat(pricePerKg.value) || 0;
+      const u = unit.value;
+      let total = u === 'kg' ? q * p : (q / 1000) * p;
+      totalPrice.value = total.toFixed(2);
+    }
 
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-      });
-
-      drawer.addEventListener('click', (e) => {
-        const a = e.target.closest('a[href]');
-        if (a) closeDrawer();
-      });
-    })();
+    qty.addEventListener('input', calc);
+    pricePerKg.addEventListener('input', calc);
+    unit.addEventListener('change', calc);
   </script>
 </body>
+
 </html>
