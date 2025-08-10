@@ -1,44 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Product Price Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Sidebar and main-content responsiveness */
-    @media (max-width: 900px) {
-      .sidebar { width: 120px; }
-      .main-content { margin-left: 130px; }
-    }
-    @media (max-width: 600px) {
-      .sidebar {
-        position: fixed;
-        left: 0; top: 0; bottom: 0;
-        width: 70px;
-        min-width: 70px;
-        padding: 10px 0 0 0;
-        border-right: 1px solid #e0e0e0;
-        z-index: 100;
-        background: #f3f5ed;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        align-items: center;
-      }
-      .sidebar-link {
-        padding: 10px 0;
-        font-size: 0.95em;
-        width: 100%;
-        text-align: center;
-      }
-      .main-content {
-        margin-left: 70px;
-        padding: 1rem 0.5rem;
-      }
+    /* Top bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #f3f5ed;
+      border-bottom: 1px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      z-index: 200;
     }
 
-    /* Card container styling and mobile fixes */
+    .hamburger-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .hamburger {
+      width: 22px;
+      height: 2px;
+      background: #234123;
+      position: relative;
+      display: block;
+    }
+
+    .hamburger::before,
+    .hamburger::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 22px;
+      height: 2px;
+      background: #234123;
+    }
+
+    .hamburger::before {
+      top: -6px;
+    }
+
+    .hamburger::after {
+      top: 6px;
+    }
+
+    /* Drawer */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 240px;
+      background: #f3f5ed;
+      border-right: 1px solid #e0e0e0;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 300;
+      padding: 70px 0 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-logo {
+      text-align: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .drawer-logo img {
+      max-height: 60px;
+      width: auto;
+    }
+
+    .drawer-link {
+      padding: 12px 18px;
+      font-size: 1em;
+      color: #234123;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .drawer-link:hover {
+      background-color: #e0e0e0;
+    }
+
+    .drawer-link.active {
+      background-color: #e9efe9;
+    }
+
+    /* Backdrop */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.28);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 250;
+    }
+
+    .backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Main content */
+    .main-content {
+      position: relative;
+      padding: 72px 2rem 2rem;
+      /* space for topbar */
+    }
+
+    /* Card container */
     .card {
       width: 100%;
       max-width: 800px;
@@ -47,7 +142,7 @@
       box-sizing: border-box;
       padding: 1.5rem;
       background: #fff;
-      box-shadow: 0 2px 8px rgba(38,58,74,0.04);
+      box-shadow: 0 2px 8px rgba(38, 58, 74, 0.04);
       overflow-x: auto;
     }
 
@@ -58,15 +153,18 @@
       border-collapse: collapse;
       font-size: 1em;
     }
-    .ingredients-table th, 
+
+    .ingredients-table th,
     .ingredients-table td {
       font-size: 1em;
       padding: 0.5rem;
       word-break: break-word;
     }
 
-    /* Input styles for all form elements */
-    input[type="number"], input[type="text"], select {
+    /* Form inputs */
+    input[type="number"],
+    input[type="text"],
+    select {
       width: 100%;
       padding: 0.5rem;
       font-size: 1rem;
@@ -75,9 +173,11 @@
       border: 1px solid #d1d5db;
       margin-bottom: 0.25rem;
     }
+
     label {
       font-weight: 600;
     }
+
     .btn {
       border-radius: 6px;
       font-size: 1rem;
@@ -87,94 +187,136 @@
       font-weight: 500;
       transition: background 0.15s;
     }
-    /* Remove default blue outline, replaced with box shadow for accessibility */
+
     .btn:focus {
       outline: none;
       box-shadow: 0 0 0 2px #aacdbb;
     }
+
     .btn:hover {
       filter: brightness(0.95);
     }
 
-    /* Pricing results grid responsive fix */
+    /* Pricing results grid */
     #pricingResults .results-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
     }
 
-    /* Mobile adjustments */
+    /* Responsive tweaks */
     @media (max-width: 900px) {
+      .main-content {
+        padding: 72px 1.5rem 1.5rem;
+      }
+
       .card {
         max-width: 95vw;
         padding: 1rem;
       }
     }
+
     @media (max-width: 700px) {
       .card {
         max-width: 100vw;
-        border-radius: 0px;
+        border-radius: 0;
       }
+
       .ingredients-table table {
         min-width: 420px;
         font-size: 0.98em;
       }
     }
+
     @media (max-width: 600px) {
       .main-content {
-        padding: 1rem 0.5rem;
+        padding: 68px 0.5rem 1rem;
       }
+
+      .drawer {
+        width: 78vw;
+      }
+
       .card {
         max-width: 100vw !important;
         width: 100vw !important;
         margin: 0 !important;
-        border-radius: 0px !important;
-        box-sizing: border-box;
+        border-radius: 0 !important;
         padding: 1rem 0.5rem !important;
         overflow-x: auto;
       }
+
       .ingredients-table table {
         font-size: 0.95em;
         min-width: 360px;
       }
-      .ingredients-table th, .ingredients-table td {
+
+      .ingredients-table th,
+      .ingredients-table td {
         padding: 0.4rem 0.25rem;
         font-size: 0.92em;
       }
+
       #pricingResults .results-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
       }
-      #pricingResults>div, #pricingResults>h3 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
-      #pricingResults .results-grid > div {
-        min-width: 0;
-        font-size:1em;
-      }
     }
-    /* Success, error, hidden message styles (if needed by script) */
-    .message-success { color: #286d42; background: #e6f7e7; border-left: 4px solid #286d42; padding: 0.75em 1em;}
-    .message-error { color: #872a2a; background: #f9e6e7; border-left: 4px solid #872a2a; padding: 0.75em 1em;}
-    .hidden { display: none; }
+
+    /* Messages */
+    .message-success {
+      color: #286d42;
+      background: #e6f7e7;
+      border-left: 4px solid #286d42;
+      padding: 0.75em 1em;
+    }
+
+    .message-error {
+      color: #872a2a;
+      background: #f9e6e7;
+      border-left: 4px solid #872a2a;
+      padding: 0.75em 1em;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
-  <aside class="sidebar">
-      <a href="index.html" class="sidebar-link">Home</a>
-      <a href="add-material.html" class="sidebar-link">Add Material</a>
-      <a href="product-price.html" class="sidebar-link active">Product Price</a>
-  </aside>
+  <!-- Top bar with hamburger + brand logo -->
+  <header class="topbar" role="banner">
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open navigation" aria-controls="drawerNav"
+      aria-expanded="false">
+      <span class="hamburger" aria-hidden="true"></span>
+    </button>
+    <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" style="height:36px; width:auto;">
+  </header>
+
+  <!-- Drawer menu -->
+  <nav class="drawer" id="drawerNav" aria-hidden="true">
+    <div class="drawer-logo">
+      <img src="assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo">
+    </div>
+    <a href="index.html" class="drawer-link">Home</a>
+    <a href="add-material.html" class="drawer-link">Add Material</a>
+    <a href="product-price.html" class="drawer-link active">Product Price</a>
+  </nav>
+
+  <!-- Backdrop -->
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- Main content -->
   <main class="main-content">
     <h2 style="font-size:1.5rem;font-weight:600;margin-bottom:1.5rem;">
       Product Price Calculator
     </h2>
+
     <div class="card">
       <div style="margin-bottom:2rem;">
         <h3 style="font-size:1rem;font-weight:500;margin-bottom:1rem;">Select Ingredients</h3>
         <div class="ingredients-table" style="margin-bottom:1rem;">
-          <!-- Table is always responsive due to .card overflow-x:auto; -->
           <table>
             <thead>
               <tr style="border-bottom:1px solid #eee;">
@@ -185,16 +327,18 @@
                 <th style="text-align:right;">Action</th>
               </tr>
             </thead>
-            <tbody id="materialRows">
-            </tbody>
+            <tbody id="materialRows"></tbody>
           </table>
         </div>
-        <button class="btn" id="addRowBtn" style="width:100%;background:#f8f9fa;color:#000;border:1px dashed #ccc;padding:0.75rem;">+ Add Ingredient</button>
+        <button class="btn" id="addRowBtn"
+          style="width:100%;background:#f8f9fa;color:#000;border:1px dashed #ccc;padding:0.75rem;">+ Add
+          Ingredient</button>
         <div style="margin-top:1rem;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-weight:500;">Total Ingredient Cost:</span>
           <span id="totalMaterialCost" style="font-weight:500;">₹0.00</span>
         </div>
       </div>
+
       <div style="margin-bottom:2rem;">
         <h3 style="font-size:1rem;font-weight:500;margin-bottom:1rem;">Bottle Information</h3>
         <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:1rem;margin-bottom:1rem;">
@@ -212,14 +356,20 @@
           <span id="totalBottleCost" style="font-weight:500;">₹0.00</span>
         </div>
       </div>
+
       <div style="margin-bottom:1.5rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8f9fa;border-radius:4px;">
+        <div
+          style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:#f8f9fa;border-radius:4px;">
           <span style="font-weight:600;">Total Base Cost (Ingredients + Bottles):</span>
           <span id="totalCost" style="font-weight:600;">₹0.00</span>
         </div>
       </div>
-      <button class="btn" id="calcBtn" style="width:100%;background:#234123;color:white;padding:0.75rem;font-weight:500;">Calculate Product Price</button>
+
+      <button class="btn" id="calcBtn"
+        style="width:100%;background:#234123;color:white;padding:0.75rem;font-weight:500;">Calculate Product
+        Price</button>
     </div>
+
     <div class="card" id="pricingResults" style="display:none;">
       <h3 style="font-size:1rem;font-weight:500;margin-bottom:1rem;">Pricing Calculations</h3>
       <div class="results-grid">
@@ -239,6 +389,7 @@
           <div style="color:#666;font-size:0.875rem;">(C + M1) × 12%</div>
         </div>
       </div>
+
       <div style="margin-top:1.5rem;text-align:center;padding:1rem;background:#234123;color:white;border-radius:8px;">
         <div style="margin-bottom:0.5rem;">Total Selling Price</div>
         <div style="font-size:1.5rem;font-weight:600;" id="resultTotalPrice"></div>
@@ -248,20 +399,45 @@
       </div>
     </div>
   </main>
+
+  <!-- Page logic -->
   <script type="module" src="product-price.js"></script>
+
+  <!-- Drawer toggle script -->
   <script>
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(registration => {
-            console.log('ServiceWorker registration successful');
-          })
-          .catch(err => {
-            console.log('ServiceWorker registration failed: ', err);
-          });
+    (function () {
+      const btn = document.getElementById('hamburgerBtn');
+      const drawer = document.getElementById('drawerNav');
+      const backdrop = document.getElementById('backdrop');
+
+      function openDrawer() {
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        btn.setAttribute('aria-expanded', 'true');
+        const firstLink = drawer.querySelector('a');
+        if (firstLink) firstLink.focus({ preventScroll: true });
+        document.body.style.overflow = 'hidden';
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.focus({ preventScroll: true });
+        document.body.style.overflow = '';
+      }
+      btn.addEventListener('click', () => {
+        drawer.classList.contains('open') ? closeDrawer() : openDrawer();
       });
-    }
+      backdrop.addEventListener('click', closeDrawer);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+      });
+      drawer.addEventListener('click', (e) => {
+        if (e.target.closest('a[href]')) closeDrawer();
+      });
+    })();
   </script>
 </body>
 </html>
