@@ -1,5 +1,5 @@
 // add-material.js
-import { db, auth } from './firebase-config.js';
+import { db, auth } from './firebase/firebase-config.js';
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (unit === 'kg') {
             total = qty * pricePerUnit; // qty in kg × price per kg
         } else if (unit === 'gm') {
-            total = qty * pricePerUnit; // qty in gm × price per gm
+            // convert gm to kg for total price if pricePerUnit is per gm
+            total = (qty / 1000) * (pricePerUnit * 1000); // convert to kg × price per kg
         }
         priceInput.value = total.toFixed(2);
     }
@@ -66,23 +67,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Convert quantity to grams for DB
-            if (data.unit === 'kg') {
-                data.quantity = data.quantity * 1000;
+            // Convert everything to kg and pricePerKg for DB
+            if (unitSelect.value === 'kg') {
+                data.quantity = data.quantity * 1000; // store as grams
+                data.pricePerKg = data.pricePerKg; // already per kg
+            } else if (unitSelect.value === 'gm') {
+                data.quantity = data.quantity; // already in grams
+                data.pricePerKg = data.pricePerKg * 1000; // convert per gm to per kg
             }
             data.unit = "gms";
 
-            // If unit was gm, pricePerKg needs converting for DB consistency
-            if (unitSelect.value === 'gm') {
-                // price entered per gm → convert to per kg for DB reference
-                data.pricePerKg = data.pricePerKg * 1000;
-            }
-
-            // Total = Price + GST + Hamali
-            const price = data.price || 0;
+            // Calculate total cost as (quantity in kg) * (pricePerKg)
+            const qtyKg = (unitSelect.value === 'kg') ? (Number(formData.get('quantity')) || 0) : ((Number(formData.get('quantity')) || 0) / 1000);
+            const pricePerKg = (unitSelect.value === 'kg') ? (Number(formData.get('pricePerKg')) || 0) : ((Number(formData.get('pricePerKg')) || 0) * 1000);
+            const baseTotal = qtyKg * pricePerKg;
             const gst = data.gst || 0;
             const hamali = data.hamali || 0;
-            data.total = price + gst + hamali;
+            data.total = baseTotal + gst + hamali;
 
             // Add user id
             data.userId = auth.currentUser.uid;

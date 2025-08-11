@@ -307,7 +307,7 @@
       <div style="display:flex; gap:10px;">
         <div style="flex:1;">
           <label for="quantity">Quantity</label>
-          <input name="quantity" id="quantity" type="number" min="1" required placeholder="Enter Quantity">
+          <input name="quantity" id="quantity" type="number" min="0" step="any" required placeholder="Enter Quantity">
         </div>
         <div style="width:100px;">
           <label for="unit">Unit</label>
@@ -319,7 +319,7 @@
       </div>
 
       <label for="pricePerKg">Price</label>
-      <input name="pricePerKg" id="pricePerKg" type="number" min="0" required placeholder="Enter Price">
+  <input name="pricePerKg" id="pricePerKg" type="number" min="0" step="any" required placeholder="Enter Price">
 
       <input name="price" id="price" type="number" min="0" placeholder="Total Price" readonly>
 
@@ -335,39 +335,8 @@
     <div id="addMaterialMsg" class="hidden"></div>
   </main>
 
-  <script>
-    const btn = document.getElementById('hamburgerBtn');
-    const drawer = document.getElementById('drawerNav');
-    const backdrop = document.getElementById('backdrop');
-
-    btn.addEventListener('click', () => {
-      drawer.classList.toggle('open');
-      backdrop.classList.toggle('open');
-    });
-
-    backdrop.addEventListener('click', () => {
-      drawer.classList.remove('open');
-      backdrop.classList.remove('open');
-    });
-
-    // Auto price calculation
-    const qty = document.getElementById('quantity');
-    const pricePerKg = document.getElementById('pricePerKg');
-    const unit = document.getElementById('unit');
-    const totalPrice = document.getElementById('price');
-
-    function calc() {
-      const q = parseFloat(qty.value) || 0;
-      const p = parseFloat(pricePerKg.value) || 0;
-      const u = unit.value;
-      let total = u === 'kg' ? q * p : (q / 1000) * p;
-      totalPrice.value = total.toFixed(2);
-    }
-
-    qty.addEventListener('input', calc);
-    pricePerKg.addEventListener('input', calc);
-    unit.addEventListener('change', calc);
-  </script>
+  <script type="module" src="/src/burger-menu.js"></script>
+  <script type="module" src="/src/add-material.js"></script>
 </body>
 
 </html>

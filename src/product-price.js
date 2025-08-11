@@ -1,6 +1,6 @@
 // product-price.js
 // Import Firebase modules from the shared config file
-import { db, auth } from './firebase-config.js';
+import { db, auth } from './firebase/firebase-config.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -96,7 +96,13 @@ function renderRows() {
                 </select>
             </td>
             <td style="padding:0.75rem 0.5rem;text-align:center;">
-                <input class="qtyInput" data-idx="${idx}" type="number" min="0" step="0.01" value="${row.quantity || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+                <input class="qtyInput" data-idx="${idx}" type="number" min="0" step="any" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]+" value="${row.quantity || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+            </td>
+            <td style="padding:0.75rem 0.5rem;text-align:center;">
+                <select class="unitSelect" data-idx="${idx}" style="width:70px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+                    <option value="gm" ${row.unit === 'gm' ? 'selected' : ''}>gm</option>
+                    <option value="kg" ${!row.unit || row.unit === 'kg' ? 'selected' : ''}>kg</option>
+                </select>
             </td>
             <td style="padding:0.75rem 0.5rem;text-align:center;">
                 <input class="costInput" data-idx="${idx}" type="number" min="0" step="0.01" value="${row.costPerKg || ''}" style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;" disabled>
@@ -110,9 +116,74 @@ function renderRows() {
         </tr>
     `).join('');
 
+    // Attach event listeners for new unit dropdown
+    document.querySelectorAll('.unitSelect').forEach(sel => sel.onchange = function(e) {
+        const idx = +e.target.dataset.idx;
+        const prevUnit = materialRows[idx].unit || 'kg';
+        const newUnit = e.target.value;
+        // Do not change quantity!
+        materialRows[idx].unit = newUnit;
+        // Convert cost per unit for display and calculation
+        let baseCostPerKg = materialRows[idx].baseCostPerKg || 0;
+        // Always use the original DB price per kg for conversion
+        if (newUnit === 'gm') {
+            materialRows[idx].costPerKg = baseCostPerKg / 1000; // cost per gm
+        } else {
+            materialRows[idx].costPerKg = baseCostPerKg; // cost per kg
+        }
+        // Calculate total cost as quantity × cost per selected unit
+        let qty = materialRows[idx].quantity || 0;
+        let costPerUnit = 0;
+        let dbQty = materialRows[idx].dbQty || 0;
+        let dbUnit = materialRows[idx].dbUnit || 'gm';
+        let totalPrice = materialRows[idx].dbTotalPrice || 0;
+        if (materialRows[idx].unit === 'kg') {
+            let qtyKg = dbUnit === 'kg' ? dbQty : dbQty / 1000;
+            costPerUnit = qtyKg > 0 ? totalPrice / qtyKg : 0;
+        } else {
+            let qtyGm = dbUnit === 'gm' ? dbQty : dbQty * 1000;
+            costPerUnit = qtyGm > 0 ? totalPrice / qtyGm : 0;
+        }
+        materialRows[idx].costPerKg = costPerUnit;
+        materialRows[idx].totalCost = qty * costPerUnit;
+        renderRows();
+    });
+
     // Attach event listeners
     document.querySelectorAll('.materialSelect').forEach(sel => sel.onchange = onRowChange);
-    document.querySelectorAll('.qtyInput').forEach(inp => inp.oninput = onRowChange);
+    // Only update totals on input, but re-render on change for quantity
+    document.querySelectorAll('.qtyInput').forEach(inp => {
+        inp.oninput = function(e) {
+            const idx = +e.target.dataset.idx;
+            let qty = +e.target.value;
+            let row = materialRows[idx];
+            row.quantity = qty;
+            // Always recalculate cost per unit from original DB values
+            let totalPrice = row.dbTotalPrice || 0;
+            let dbQty = row.dbQty || 0;
+            let dbUnit = row.dbUnit || 'gm';
+            let costPerUnit = 0;
+            if (row.unit === 'gm') {
+                // price per gm
+                costPerUnit = dbUnit === 'gm' ? (dbQty > 0 ? totalPrice / dbQty : 0) : (dbQty > 0 ? totalPrice / (dbQty * 1000) : 0);
+            } else {
+                // price per kg
+                costPerUnit = dbUnit === 'kg' ? (dbQty > 0 ? totalPrice / dbQty : 0) : (dbQty > 0 ? totalPrice / (dbQty / 1000) : 0);
+            }
+            row.costPerKg = costPerUnit;
+            row.totalCost = qty * costPerUnit;
+            // Update the total cost cell directly
+            const tr = inp.closest('tr');
+            if (tr) {
+                const totalCostCell = tr.querySelector('td:nth-child(5)');
+                if (totalCostCell) {
+                    totalCostCell.textContent = `₹${(row.totalCost || 0).toFixed(2)}`;
+                }
+            }
+            updateTotals();
+        };
+        inp.onchange = onRowChange;
+    });
 
     updateTotals();
 }
@@ -128,23 +199,37 @@ function onRowChange(e) {
     if (e.target.classList.contains('materialSelect')) {
         row.materialId = e.target.value;
         const mat = materials.find(m => m.id === row.materialId);
-
+        let totalPrice = 0;
+        let dbQty = 0;
+        let dbUnit = 'gm';
         if (mat) {
-            // Calculate inclusive cost per kg = total / quantity
-            if (mat.quantity && mat.total) {
-                row.costPerKg = mat.total / mat.quantity;
-            } else {
-                row.costPerKg = mat.pricePerKg || 0;
-            }
-        } else {
-            row.costPerKg = 0;
+            totalPrice = mat.total || 0;
+            dbQty = mat.quantity || 0;
+            // Auto-detect unit: if < 10, treat as kg; else gm
+            dbUnit = dbQty < 10 ? 'kg' : 'gm';
         }
+        row.dbTotalPrice = totalPrice;
+        row.dbQty = dbQty;
+        row.dbUnit = dbUnit;
+        // Convert to selected unit for display
+        let qtyInKg = dbUnit === 'kg' ? dbQty : dbQty / 1000;
+        let qtyInGm = dbUnit === 'gm' ? dbQty : dbQty * 1000;
+        if (row.unit === 'gm') {
+            row.quantity = isNaN(qtyInGm) ? 0 : qtyInGm;
+            row.costPerKg = (qtyInGm && !isNaN(totalPrice / qtyInGm)) ? totalPrice / qtyInGm : 0;
+        } else {
+            row.quantity = isNaN(qtyInKg) ? 0 : qtyInKg;
+            row.costPerKg = (qtyInKg && !isNaN(totalPrice / qtyInKg)) ? totalPrice / qtyInKg : 0;
+        }
+        // Always calculate total cost as (quantity) × (cost per selected unit)
+        row.totalCost = row.quantity * (row.costPerKg || 0);
     }
     if (e.target.classList.contains('qtyInput')) {
         row.quantity = +e.target.value;
     }
-
-    row.totalCost = (row.costPerKg || 0) * (row.quantity || 0);
+    // Calculate totalCost as quantity × cost per selected unit
+    let qty = row.quantity || 0;
+    row.totalCost = qty * (row.costPerKg || 0);
     renderRows();  // Re-render rows including totals
 }
 

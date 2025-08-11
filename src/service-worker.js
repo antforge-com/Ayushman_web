@@ -7,7 +7,7 @@ const urlsToCache = [
   '/product-price.html',
   '/all-materials.html',
   '/styles.css',
-  '/firebase-config.js',
+  '/firebase/firebase-config.js',
   '/add-material.js',
   '/product-price.js',
   '/all-materials.js',
@@ -45,3 +45,6 @@ self.addEventListener('fetch', event => {
       })
   );
 });
+
+// If using Firebase in service worker, import config from correct path
+// import { db, auth } from './firebase/firebase-config.js';
