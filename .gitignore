@@ -1,0 +1,13 @@
+<<<<<<< HEAD
+node_modules
+=======
+# Firebase credentials
+firebase-credentials.js
+
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Build output
+/lib/
+>>>>>>> 3259b4ccaacc835fbfa1d87c6e2925cae017a211

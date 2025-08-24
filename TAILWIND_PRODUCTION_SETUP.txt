@@ -1,0 +1,22 @@
+// Step-by-step instructions to use Tailwind CSS in production:
+
+1. Install Tailwind CSS via npm:
+   npm install -D tailwindcss postcss autoprefixer
+
+2. Initialize Tailwind config:
+   npx tailwindcss init
+
+3. Create a CSS file (e.g., styles/tailwind.css) with:
+   @tailwind base;
+   @tailwind components;
+   @tailwind utilities;
+
+4. Configure your build tool (PostCSS, Webpack, etc.) or use Tailwind CLI:
+   npx tailwindcss -i ./styles/tailwind.css -o ./styles/output.css --minify
+
+5. Link the generated output.css in your HTML:
+   <link rel="stylesheet" href="styles/output.css">
+
+6. Remove <script src="https://cdn.tailwindcss.com"></script> from your HTML files.
+
+See https://tailwindcss.com/docs/installation for more details.
