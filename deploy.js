@@ -12,21 +12,33 @@ if (!fs.existsSync(buildDir)) {
 // List of files to copy
 const filesToCopy = [
     'index.html',
-    'add-material.html',
-    'product-price.html',
-    'all-materials.html',
-    'all-product-prices.html', // New file added
-    'firebase-config.js',
-    'add-material.js',
-    'product-price.js',
-    'all-materials.js',
-    'all-product-prices.js', // New file added
-    'styles.css'
+    'login.html',
+    'manifest.json',
+    'pages/add-material.html',
+    'pages/product-price.html',
+    'pages/all-materials.html',
+    'pages/all-product-prices.html',
+    'pages/drug-entry.html',
+    'pages/all-drugs.html',
+    'js/firebase-config.js',
+    'js/add-material.js',
+    'js/product-price.js',
+    'js/all-materials.js',
+    'js/all-product-prices.js',
+    'js/all-drugs.js',
+    'js/app.js',
+    'js/service-worker.js',
+    'css/styles.css'
 ];
 
 // Copy files to build directory
 filesToCopy.forEach(file => {
     try {
+        const destDir = path.dirname(path.join(buildDir, file));
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+        
         fs.copyFileSync(
             path.join(__dirname, file),
             path.join(buildDir, file)
@@ -36,6 +48,30 @@ filesToCopy.forEach(file => {
         console.error(`× Error copying ${file}:`, err.message);
     }
 });
+
+// Copy assets directory
+const assetsSource = path.join(__dirname, 'assets');
+const assetsDestination = path.join(buildDir, 'assets');
+
+if (fs.existsSync(assetsSource)) {
+    if (!fs.existsSync(assetsDestination)) {
+        fs.mkdirSync(assetsDestination, { recursive: true });
+    }
+    
+    // Copy all files in assets directory
+    const assetFiles = fs.readdirSync(assetsSource);
+    assetFiles.forEach(assetFile => {
+        try {
+            fs.copyFileSync(
+                path.join(assetsSource, assetFile),
+                path.join(assetsDestination, assetFile)
+            );
+            console.log(`✓ Copied assets/${assetFile}`);
+        } catch (err) {
+            console.error(`× Error copying assets/${assetFile}:`, err.message);
+        }
+    });
+}
 
 // Create .htaccess for Apache servers
 const htaccess = `
