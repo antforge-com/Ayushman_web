@@ -500,13 +500,15 @@ function clearResults() {
                 <div style="font-size:1.25rem;font-weight:700;" id="resultMargin2"></div>
                 <div style="color:#666;font-size:0.875rem;">(Base Cost + Margin 1) × 12%</div>
             </div>
+            <div style="padding:1.2rem;background:#f0f0f0;text-align:center;">
+                <div style="color:#666;margin-bottom:0.5rem;">Price Per Bottle (₹)</div>
+                <div style="font-size:1.25rem;font-weight:700;" id="resultPricePerBottle"></div>
+                <div style="color:#666;font-size:0.875rem;">Total Price ÷ Number of Bottles</div>
+            </div>
         </div>
         <div style="margin-top:1.5rem;text-align:center;padding:1.2rem;background:#234123;color:white;border-radius:12px;">
             <div style="margin-bottom:0.5rem;">Total Selling Price</div>
             <div style="font-size:1.5rem;font-weight:700;" id="resultTotalPrice"></div>
-            <div style="font-size:0.95rem;margin-top:0.5rem;">
-                Gross Selling Price per Bottle: <span id="resultPricePerBottle"></span>
-            </div>
         </div>
     `;
 }
