@@ -68,24 +68,35 @@ const setupAuthCheck = async () => {
  * @param {string} searchProductName - Case-insensitive search के लिए product का नाम.
  */
 const setupProductPriceListener = (currentUserId, optionalQuery = [], searchProductName = null) => {
+    console.log('setupProductPriceListener called with userId:', currentUserId);
+    console.log('appId:', appId);
+    
     if (unsubscribe) {
         unsubscribe(); // Unsubscribe from the previous listener
     }
 
     if (!db || !currentUserId) {
-        console.error("Database or user ID not available.");
+        console.error("Database or user ID not available. db:", !!db, "userId:", currentUserId);
         productPricesListContainer.innerHTML = '<div class="message-box message-error">Could not retrieve data. Please log in again.</div>';
         return;
     }
 
     // FIX: सीधे user-specific collection path का उपयोग करें
     const collectionPath = `artifacts/${appId}/users/${currentUserId}/products`;
+    console.log('Fetching from collection path:', collectionPath);
+    
     let baseQuery = collection(db, collectionPath);
     let finalQuery = query(baseQuery, ...optionalQuery);
     
+    // Show loading state
+    productPricesListContainer.innerHTML = '<div class="message-box message-info">Loading products...</div>';
+    
     unsubscribe = onSnapshot(finalQuery, (snapshot) => {
+        console.log('Snapshot received. Number of documents:', snapshot.size);
+        
         let productPrices = [];
         snapshot.forEach(doc => {
+            console.log('Product document:', doc.id, doc.data());
             productPrices.push({ id: doc.id, ...doc.data() });
         });
 
@@ -94,6 +105,7 @@ const setupProductPriceListener = (currentUserId, optionalQuery = [], searchProd
             productPrices = productPrices.filter(item => 
                 item.name && item.name.toLowerCase().includes(lowerCaseSearch)
             );
+            console.log('Filtered products by name:', productPrices.length);
         }
 
         // Sort data on the client-side alphabetically by product name
@@ -105,10 +117,21 @@ const setupProductPriceListener = (currentUserId, optionalQuery = [], searchProd
             return 0;
         });
 
+        console.log('Displaying products:', productPrices.length);
         displayProductPrices(productPrices);
     }, (error) => {
-        console.error("Error listening to product prices: ", error);
-        productPricesListContainer.innerHTML = '<div class="message-box message-error">Error loading data.</div>';
+        console.error("Error listening to product prices:", error);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        
+        let errorMessage = 'Error loading data.';
+        if (error.code === 'permission-denied') {
+            errorMessage = 'Permission denied. Please check your Firestore security rules.';
+        } else if (error.code === 'unavailable') {
+            errorMessage = 'Database unavailable. Please check your internet connection.';
+        }
+        
+        productPricesListContainer.innerHTML = `<div class="message-box message-error">${errorMessage}<br><small>Error: ${error.message}</small></div>`;
     });
 };
 
