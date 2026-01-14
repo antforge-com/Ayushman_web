@@ -9,7 +9,6 @@
     <title>Home - Product App</title>
 
     <!-- PWA / Icons -->
-    <!-- <link rel="manifest" href="/manifest.json"> -->
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -151,14 +150,14 @@
             width: 260px;
             background: #ffffff;
             border-right: 1px solid #e0e0e0;
-        transform: translateX(-100%);
-        transition: transform .25s ease;
-        z-index: 300;
-        padding: 78px 0 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        overflow: hidden;
+            transform: translateX(-100%);
+            transition: transform .25s ease;
+            z-index: 300;
+            padding: 78px 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
         }
 
         .drawer.open {
@@ -673,23 +672,52 @@
         </section>
     </main>
 
+    <!-- Sidebar / Drawer Logic - MOVED OUTSIDE MODULE FOR RELIABILITY -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('hamburgerBtn');
+            const drawer = document.getElementById('drawerNav');
+            const backdrop = document.getElementById('backdrop');
+
+            if (btn && drawer && backdrop) {
+                function openDrawer() {
+                    drawer.classList.add('open');
+                    backdrop.classList.add('open');
+                    drawer.setAttribute('aria-hidden', 'false');
+                    btn.setAttribute('aria-expanded', 'true');
+                    const firstLink = drawer.querySelector('a');
+                    if (firstLink) firstLink.focus({ preventScroll: true });
+                    document.body.style.overflow = 'hidden';
+                }
+                function closeDrawer() {
+                    drawer.classList.remove('open');
+                    backdrop.classList.remove('open');
+                    drawer.setAttribute('aria-hidden', 'true');
+                    btn.setAttribute('aria-expanded', 'false');
+                    btn.focus({ preventScroll: true });
+                    document.body.style.overflow = '';
+                }
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+                });
+                backdrop.addEventListener('click', closeDrawer);
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+                });
+                drawer.addEventListener('click', (e) => {
+                    if (e.target.closest('a[href]')) closeDrawer();
+                });
+            } else {
+                console.error('Drawer elements not found in index.html');
+            }
+        });
+    </script>
+
     <!-- Firebase -->
     <script type="module">
         // Topbar logout button for desktop
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoutTopbarBtn = document.getElementById('logoutTopbarBtn');
-            if (logoutTopbarBtn) {
-                logoutTopbarBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ signOut }) => signOut(auth));
-                        window.location.href = 'login.html';
-                    } catch (error) {
-                        console.error("Error signing out: ", error);
-                    }
-                });
-            }
-        });
         import { initializeFirebase, auth, db, getDoc, doc } from "./js/firebase-config.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -748,63 +776,22 @@
         // Call the function when the window loads.
         window.onload = checkAuthState;
 
-        // Drawer toggle
+        // Logout functionality - kept in module because it needs 'auth'
         document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('hamburgerBtn');
-            const drawer = document.getElementById('drawerNav');
-            const backdrop = document.getElementById('backdrop');
-
-            if (btn && drawer && backdrop) {
-                function openDrawer() {
-                    drawer.classList.add('open');
-                    backdrop.classList.add('open');
-                    drawer.setAttribute('aria-hidden', 'false');
-                    btn.setAttribute('aria-expanded', 'true');
-                    const firstLink = drawer.querySelector('a');
-                    if (firstLink) firstLink.focus({ preventScroll: true });
-                    document.body.style.overflow = 'hidden';
-                }
-                function closeDrawer() {
-                    drawer.classList.remove('open');
-                    backdrop.classList.remove('open');
-                    drawer.setAttribute('aria-hidden', 'true');
-                    btn.setAttribute('aria-expanded', 'false');
-                    btn.focus({ preventScroll: true });
-                    document.body.style.overflow = '';
-                }
-
-                btn.addEventListener('click', () => {
-                    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await signOut(auth);
+                        console.log("User signed out successfully.");
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Error signing out: ", error);
+                    }
                 });
-                backdrop.addEventListener('click', closeDrawer);
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-                });
-                drawer.addEventListener('click', (e) => {
-                    if (e.target.closest('a[href]')) closeDrawer();
-                });
-
-                // Logout functionality
-                const logoutLink = document.getElementById('logoutLink');
-                if (logoutLink) {
-                    logoutLink.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        try {
-                            await signOut(auth);
-                            console.log("User signed out successfully.");
-                            window.location.href = 'login.html';
-                        } catch (error) {
-                            console.error("Error signing out: ", error);
-                        }
-                    });
-                }
-            } else {
-                console.error('Drawer elements not found. Check your HTML IDs.');
             }
         });
-    </script>
-    <script>
-    // ...existing code...
     </script>
 </body>
 

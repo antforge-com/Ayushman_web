@@ -1,8 +1,8 @@
 // add-material.js
-import { db, userId, appId, initializeFirebase, collection, addDoc, Timestamp } from "./firebase-config.js";
+import { db, userId, appId, initializeFirebase, collection, addDoc, Timestamp } from "../firebase-config.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { doc, getDoc, updateDoc, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { auth } from "./firebase-config.js";
+import { auth } from "../firebase-config.js";
 
 // Access DOM elements
 const materialInput = document.getElementById('material');

@@ -1,6 +1,6 @@
 // product-price.js
 // Import necessary Firebase modules from the shared config file
-import { db, auth, appId, initializeFirebase, collection, getDocs, addDoc, Timestamp } from "./firebase-config.js";
+import { db, auth, appId, initializeFirebase, collection, getDocs, addDoc, Timestamp } from "../firebase-config.js";
 import { doc, getDoc, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 

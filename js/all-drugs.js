@@ -1,4 +1,4 @@
-import { db, auth, appId, initializeFirebase, collection, onSnapshot, query, where, Timestamp } from './firebase-config.js';
+import { db, auth, appId, initializeFirebase, collection, onSnapshot, query, where, Timestamp } from '../firebase-config.js';
 import { doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const drugsListContainer = document.getElementById('drugsList');
