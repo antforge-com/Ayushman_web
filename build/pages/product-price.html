@@ -258,13 +258,15 @@
     .ingredients-table {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      margin: 0 -18px;
+      padding: 0 18px;
     }
 
     .ingredients-table table {
       width: 100%;
-      min-width: 600px;
+      min-width: 700px;
       border-collapse: collapse;
-      font-size: 1em;
+      font-size: 0.95em;
       background: var(--surface);
       border-radius: 10px;
       overflow: hidden;
@@ -273,31 +275,42 @@
 
     .ingredients-table th,
     .ingredients-table td {
-      font-size: 1em;
-      padding: 0.7rem 0.5rem;
+      font-size: 0.9em;
+      padding: 0.75rem 0.5rem;
       word-break: break-word;
       border-bottom: 1px solid var(--border);
       text-align: center;
+      vertical-align: middle;
     }
 
     .ingredients-table th:first-child,
-    .ingredients-table-td:first-child {
+    .ingredients-table td:first-child {
       text-align: left;
+      padding-left: 0.75rem;
     }
 
     .ingredients-table th:last-child,
     .ingredients-table td:last-child {
       text-align: right;
+      padding-right: 0.75rem;
     }
 
     .ingredients-table th {
       background: #f8f8f8;
       color: var(--text);
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
     }
 
     .ingredients-table tbody tr:last-child td {
       border-bottom: none;
+    }
+
+    .ingredients-table tbody tr:hover {
+      background: #fafafa;
     }
 
     input[type="number"],
@@ -408,7 +421,7 @@
 
     #pricingResults .results-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
     }
 
@@ -416,6 +429,50 @@
       border-radius: 12px;
       box-shadow: 0 1px 4px 0 rgba(38, 58, 74, 0.04);
       border: 1.5px solid var(--border);
+    }
+
+    /* Button container responsiveness */
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .button-container {
+        flex-direction: row;
+      }
+      
+      .button-container .btn {
+        flex: 1;
+      }
+    }
+
+    /* Ingredient buttons responsiveness */
+    .ingredient-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-direction: column;
+    }
+
+    /* Product info grid responsiveness */
+    @media (min-width: 768px) {
+      .product-info-grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+
+    @media (min-width: 480px) {
+      .ingredient-buttons {
+        flex-direction: row;
+      }
+      
+      .ingredient-buttons .btn {
+        flex: 1;
+        min-width: 140px;
+      }
     }
 
     /* View All Product Prices Button Styling (Matched with Add Material's button) */
@@ -450,64 +507,212 @@
     /* Media query for tablets and smaller desktops */
     @media (max-width: 1024px) {
       .main {
-        padding: 84px 16px 24px;
+        padding: 84px 20px 24px;
+      }
+
+      .ingredients-table {
+        margin: 0 -18px;
       }
     }
 
     /* Media query for smaller tablets and large phones */
     @media (max-width: 768px) {
+      .topbar {
+        height: 60px;
+      }
+
       .topbar-logo {
         height: 50px;
       }
 
+      .main {
+        padding: 76px 16px 24px;
+      }
+
+      .main-heading {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .main-section-title {
+        font-size: 1rem;
+        margin: 20px 2px 12px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .ingredients-table {
+        margin: 0 -16px;
+        padding: 0 16px;
+      }
+
       .ingredients-table table {
-        min-width: 600px;
+        min-width: 650px;
+      }
+
+      .ingredients-table th,
+      .ingredients-table td {
+        font-size: 0.85em;
+        padding: 0.6rem 0.4rem;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+        padding: 0.45rem;
+        font-size: 0.9rem;
       }
 
       #pricingResults .results-grid {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      #pricingResults .results-grid>div {
+        padding: 1rem !important;
       }
     }
 
     /* Media query for mobile phones */
     @media (max-width: 640px) {
+      .topbar {
+        height: 56px;
+        padding: 0 12px;
+      }
+
       .topbar-logo {
         height: 40px;
       }
 
       .drawer {
-        width: 80vw;
+        width: 85vw;
+        max-width: 300px;
       }
 
       .main {
-        padding: 80px 14px 24px;
+        padding: 72px 12px 20px;
       }
 
       .main-heading {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
       }
 
-      .ingredients-table {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .ingredients-table table {
-        min-width: 500px;
-        font-size: 0.9em;
+      .main-section-title {
+        font-size: 0.95rem;
+        margin: 18px 0 10px;
       }
 
       .card {
-        padding: 14px;
+        padding: 12px;
+        gap: 10px;
+        margin-bottom: 1rem;
       }
 
-      #pricingResults .results-grid {
-        grid-template-columns: 1fr;
+      .ingredients-table {
+        margin: 0 -12px;
+        padding: 0 12px;
+      }
+
+      .ingredients-table table {
+        min-width: 580px;
+        font-size: 0.85em;
+      }
+
+      .ingredients-table th,
+      .ingredients-table td {
+        padding: 0.5rem 0.3rem;
+        font-size: 0.8em;
+      }
+
+      .ingredients-table th:first-child,
+      .ingredients-table td:first-child {
+        padding-left: 0.5rem;
+      }
+
+      .ingredients-table th:last-child,
+      .ingredients-table td:last-child {
+        padding-right: 0.5rem;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+        padding: 0.4rem;
+        font-size: 0.875rem;
+      }
+
+      .btn {
+        padding: 0.65rem 0.875rem;
+        font-size: 0.9rem;
       }
 
       .remove-btn {
-        padding: 0.2rem 0.5rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+      }
+
+      .btn-view-prices {
+        padding: 0.55rem 1.2rem;
+        font-size: 0.9rem;
+        width: 100%;
+        justify-content: center;
+      }
+
+      #pricingResults .results-grid>div {
+        padding: 0.875rem !important;
+      }
+
+      #pricingResults .results-grid>div>div:first-child {
+        font-size: 0.85rem;
+      }
+
+      #pricingResults .results-grid>div>div:nth-child(2) {
+        font-size: 1.1rem !important;
+      }
+
+      #pricingResults .results-grid>div>div:last-child {
         font-size: 0.8rem;
+      }
+
+      .message-box {
+        padding: 0.875rem;
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Extra small phones */
+    @media (max-width: 380px) {
+      .topbar {
+        padding: 0 8px;
+      }
+
+      .main {
+        padding: 72px 8px 16px;
+      }
+
+      .main-heading {
+        font-size: 1.35rem;
+      }
+
+      .card {
+        padding: 10px;
+      }
+
+      .ingredients-table {
+        margin: 0 -10px;
+        padding: 0 10px;
+      }
+
+      .ingredients-table table {
+        min-width: 520px;
+      }
+
+      .btn {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.85rem;
       }
     }
 
@@ -619,19 +824,27 @@
     </a>
 
     <!-- Added input for Product Name -->
-    <h2 class="main-section-title">Product Name</h2>
+    <h2 class="main-section-title">Product Information</h2>
     <section class="card">
-      <input type="text" id="productNameInput" placeholder="Enter Product Name">
+      <div class="product-info-grid" style="display:grid;grid-template-columns:1fr;gap:1.5rem;">
+        <div>
+          <label style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.9rem;color:var(--text);">Product Name *</label>
+          <input type="text" id="productNameInput" placeholder="Enter Product Name" style="width:100%;height:46px;">
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.9rem;color:var(--text);">Description</label>
+          <textarea id="productDescriptionInput" placeholder="Enter product description (optional)" rows="2" style="width:100%;padding:0.75rem;border:1px solid #ddd;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.95rem;resize:none;height:46px;"></textarea>
+        </div>
+      </div>
     </section>
 
-    <h2 class="main-section-title">Select Ingredients & Bottles</h2>
+    <h2 class="main-section-title">Select Ingredients</h2>
     <section class="card">
       <div class="ingredients-table" style="margin-bottom:1.2rem;">
         <table>
           <thead>
             <tr>
-              <th style="text-align:left;">Type</th>
-              <th style="text-align:left;">Item</th>
+              <th style="text-align:left;">Ingredient</th>
               <th>Quantity</th>
               <th>Unit</th>
               <th>Cost per unit</th>
@@ -644,27 +857,42 @@
           </tbody>
         </table>
       </div>
-      <div style="display:flex;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap;">
-        <button class="btn" id="addIngredientBtn" style="flex:1;min-width:140px;">+ Add Ingredient</button>
-        <button class="btn" id="addBottleBtn" style="background:#28a745;color:#fff;flex:1;min-width:140px;">+ Add Bottle</button>
+      <button class="btn" id="addIngredientBtn" style="background:var(--primary);color:#fff;border-color:var(--primary);width:fit-content;padding:0.5rem 1rem;">+ Add Ingredient</button>
+      <div style="margin-top:1.2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <span style="font-weight:600;font-size:0.95rem;">Total Ingredient Cost:</span>
+        <span id="totalMaterialCost" style="font-weight:700;font-size:1.05rem;color:var(--primary);">₹0.00</span>
       </div>
-      <div style="margin-top:1.2rem;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-weight:600;">Total Cost (Ingredients + Bottles):</span>
-        <span id="totalMaterialCost" style="font-weight:600;">₹0.00</span>
+    </section>
+
+    <h2 class="main-section-title">Bottle Information</h2>
+    <section class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.9rem;">Number of Bottles</label>
+          <input type="number" id="numBottlesInput" min="1" step="1" value="1" placeholder="1" style="width:100%;">
+        </div>
+        <div>
+          <label style="display:block;margin-bottom:0.5rem;font-weight:600;font-size:0.9rem;">Cost per Bottle (₹)</label>
+          <input type="number" id="costPerBottleInput" min="0" step="0.01" value="0" placeholder="0" style="width:100%;">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <span style="font-weight:600;font-size:0.95rem;">Total Bottle Cost:</span>
+        <span id="totalBottleCost" style="font-weight:700;font-size:1.05rem;color:var(--primary);">₹0.00</span>
       </div>
     </section>
 
     <section class="card">
       <div
-        style="display:flex;justify-content:space-between;align-items:center;padding:0.9rem 1rem;background:#f8f8f8;border-radius:10px;margin-bottom:1.2rem;">
-        <span style="font-weight:700;">Total Base Cost:</span>
-        <span id="totalCost" style="font-weight:700;">₹0.00</span>
+        style="display:flex;justify-content:space-between;align-items:center;padding:0.9rem 1rem;background:#f8f8f8;border-radius:10px;margin-bottom:1.2rem;flex-wrap:wrap;gap:0.5rem;">
+        <span style="font-weight:700;font-size:0.95rem;">Total Base Cost (Ingredients + Bottles):</span>
+        <span id="totalCost" style="font-weight:700;font-size:1.1rem;color:var(--primary);">₹0.00</span>
       </div>
-      <div class="flex flex-col sm:flex-row gap-4 mt-6">
-        <button class="btn flex-1" id="calculateBtn">
+      <div class="button-container">
+        <button class="btn" id="calculateBtn">
           <span id="calculateButtonText">Calculate</span>
         </button>
-        <button class="btn flex-1 btn-primary" id="calculateAndSaveBtn">
+        <button class="btn btn-primary" id="calculateAndSaveBtn">
           <span id="saveButtonText">Calculate & Save</span>
           <div id="loadingIndicator" class="loading-spinner hidden"></div>
         </button>
@@ -674,28 +902,28 @@
     <h2 class="main-section-title">Pricing Calculations</h2>
     <section class="card" id="pricingResults" style="display:none;">
       <div class="results-grid">
-        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;">
-          <div style="color:#666;margin-bottom:0.5rem;">Base Cost (₹)</div>
-          <div style="font-size:1.25rem;font-weight:700;" id="resultBasePrice"></div>
-          <div style="color:#666;font-size:0.875rem;">Total ingredient + bottle cost</div>
+        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;border-radius:8px;">
+          <div style="color:#666;margin-bottom:0.5rem;font-size:0.875rem;">Base Cost (₹)</div>
+          <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="resultBasePrice"></div>
+          <div style="color:#666;font-size:0.8rem;margin-top:0.25rem;">Total ingredient + bottle cost</div>
         </div>
-        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;">
-          <div style="color:#666;margin-bottom:0.5rem;">Margin 1 (113%)</div>
-          <div style="font-size:1.25rem;font-weight:700;" id="resultMargin1"></div>
-          <div style="color:#666;font-size:0.875rem;">Base Cost × 113%</div>
+        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;border-radius:8px;">
+          <div style="color:#666;margin-bottom:0.5rem;font-size:0.875rem;">Margin 1 (113%)</div>
+          <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="resultMargin1"></div>
+          <div style="color:#666;font-size:0.8rem;margin-top:0.25rem;">Base Cost × 113%</div>
         </div>
-        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;">
-          <div style="color:#666;margin-bottom:0.5rem;">Margin 2 (12%)</div>
-          <div style="font-size:1.25rem;font-weight:700;" id="resultMargin2"></div>
-          <div style="color:#666;font-size:0.875rem;">(Base Cost + Margin 1) × 12%</div>
+        <div style="padding:1.2rem;background:#f0f0f0;text-align:center;border-radius:8px;">
+          <div style="color:#666;margin-bottom:0.5rem;font-size:0.875rem;">Margin 2 (12%)</div>
+          <div style="font-size:1.5rem;font-weight:700;color:var(--primary);" id="resultMargin2"></div>
+          <div style="color:#666;font-size:0.8rem;margin-top:0.25rem;">(Base Cost + Margin 1) × 12%</div>
         </div>
       </div>
       <div
-        style="margin-top:1.5rem;text-align:center;padding:1.2rem;background:#234123;color:white;border-radius:12px;">
-        <div style="margin-bottom:0.5rem;">Total Selling Price</div>
-        <div style="font-size:1.5rem;font-weight:700;" id="resultTotalPrice"></div>
-        <div style="font-size:0.95rem;margin-top:0.5rem;">
-          Gross Selling Price per Bottle: <span id="resultPricePerBottle"></span>
+        style="margin-top:1.5rem;text-align:center;padding:1.5rem 1.2rem;background:#234123;color:white;border-radius:12px;">
+        <div style="margin-bottom:0.5rem;font-size:0.9rem;opacity:0.9;">Total Selling Price</div>
+        <div style="font-size:2rem;font-weight:700;" id="resultTotalPrice"></div>
+        <div style="font-size:1rem;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.2);">
+          Gross Selling Price per Bottle: <span id="resultPricePerBottle" style="font-weight:700;"></span>
         </div>
       </div>
     </section>

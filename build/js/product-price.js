@@ -5,25 +5,14 @@ import { doc, getDoc, updateDoc, query, where, orderBy, limit } from "https://ww
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 // DOM elements will be accessed in DOMContentLoaded
-let materialRowsDiv, totalMaterialCostSpan, totalCostSpan, calculateBtn, calculateAndSaveBtn;
+let materialRowsDiv, totalMaterialCostSpan, totalBottleCostSpan, totalCostSpan, calculateBtn, calculateAndSaveBtn;
 let pricingResultsDiv, statusMessageDiv, calculateButtonText, saveButtonText, loadingIndicator;
-let viewAllPricesBtn, productNameInput;
+let viewAllPricesBtn, productNameInput, productDescriptionInput, numBottlesInput, costPerBottleInput;
 
 
-let materialRows = []; // Stores the current rows for material/bottle selection
+let materialRows = []; // Stores the current rows for material selection
 let materials = []; // Stores all materials fetched from Firestore
 let latestMaterials = {}; // Stores the latest material records for each unique material name
-
-// Predefined bottle database
-const bottleDatabase = [
-    { id: 'bottle_100ml', name: 'Small Bottle (100ml)', cost: 5.00 },
-    { id: 'bottle_200ml', name: 'Medium Bottle (200ml)', cost: 8.00 },
-    { id: 'bottle_500ml', name: 'Large Bottle (500ml)', cost: 12.00 },
-    { id: 'bottle_glass_100ml', name: 'Glass Bottle (100ml)', cost: 15.00 },
-    { id: 'bottle_glass_200ml', name: 'Glass Bottle (200ml)', cost: 20.00 },
-    { id: 'bottle_plastic_250ml', name: 'Plastic Bottle (250ml)', cost: 6.00 },
-    { id: 'bottle_dropper_30ml', name: 'Dropper Bottle (30ml)', cost: 25.00 }
-];
 
 
 /**
@@ -79,7 +68,7 @@ async function fetchMaterials(currentUserId) {
             materialRowsDiv.innerHTML = '<tr><td colspan="6" class="text-center italic text-gray-500 py-4">No materials found. Please add materials first.</td></tr>';
         } else {
             if (materialRows.length === 0) {
-                materialRows.push({ type: 'ingredient', materialId: '', quantity: '', unit: 'kg', costPerUnit: 0, totalCost: 0 });
+                materialRows.push({ materialId: '', quantity: '', unit: 'kg', costPerUnit: 0, totalCost: 0 });
             }
             renderRows(uniqueMaterials);
         }
@@ -94,48 +83,37 @@ async function fetchMaterials(currentUserId) {
  * @param {Array} uniqueMaterials - The list of unique materials to display in the dropdown.
  */
 function renderRows(uniqueMaterials) {
+    // Sort materials alphabetically by name
+    const sortedMaterials = [...uniqueMaterials].sort((a, b) => {
+        const nameA = (a.material || '').toLowerCase();
+        const nameB = (b.material || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
+    
     materialRowsDiv.innerHTML = materialRows.map((row, idx) => {
-        const isBottle = row.type === 'bottle';
-        
         return `
         <tr style="border-bottom:1px solid #eee;">
             <td style="padding:0.75rem 0.5rem;">
-                <span style="padding:0.5rem;color:${isBottle ? '#28a745' : '#007bff'};font-weight:600;">
-                    ${isBottle ? 'Bottle' : 'Ingredient'}
-                </span>
-            </td>
-            <td style="padding:0.75rem 0.5rem;">
-                ${isBottle ? `
-                    <select class="bottleSelect" data-idx="${idx}" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
-                        <option value="">Select Bottle</option>
-                        ${bottleDatabase.map(b => `<option value="${b.id}" ${row.bottleId === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
-                    </select>
-                ` : `
-                    <select class="materialSelect" data-idx="${idx}" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
-                        <option value="">Select Material</option>
-                        ${uniqueMaterials.map(m => `<option value="${m.id}" ${row.materialId === m.id ? 'selected' : ''}>${m.material || ''}</option>`).join('')}
-                    </select>
-                `}
+                <select class="materialSelect" data-idx="${idx}" style="width:100%;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+                    <option value="">Select Material</option>
+                    ${sortedMaterials.map(m => `<option value="${m.id}" ${row.materialId === m.id ? 'selected' : ''}>${m.material || ''}</option>`).join('')}
+                </select>
             </td>
             <td style="padding:0.75rem 0.5rem;">
                 <input class="qtyInput text-center" data-idx="${idx}" type="number" min="0" step="any" 
                        value="${row.quantity || ''}" 
-                       placeholder="${isBottle ? 'Qty' : 'Optional'}"
+                       placeholder="Quantity"
                        style="width:80px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
             </td>
             <td style="padding:0.75rem 0.5rem;">
-                ${isBottle ? `
-                    <span style="color:#666;font-style:italic;">N/A</span>
-                ` : `
-                    <select class="unitSelect text-center" data-idx="${idx}" style="width:70px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
-                        <option value="kg" ${row.unit === 'kg' ? 'selected' : ''}>kg</option>
-                        <option value="gram" ${row.unit === 'gram' ? 'selected' : ''}>gram</option>
-                        <option value="lts" ${row.unit === 'lts' ? 'selected' : ''}>lts</option>
-                        <option value="ml" ${row.unit === 'ml' ? 'selected' : ''}>ml</option>
-                        <option value="mt" ${row.unit === 'mt' ? 'selected' : ''}>mt</option>
-                        <option value="no" ${row.unit === 'no' ? 'selected' : ''}>no</option>
-                    </select>
-                `}
+                <select class="unitSelect text-center" data-idx="${idx}" style="width:70px;padding:0.5rem;border:1px solid #ddd;border-radius:4px;">
+                    <option value="kg" ${row.unit === 'kg' ? 'selected' : ''}>kg</option>
+                    <option value="gram" ${row.unit === 'gram' ? 'selected' : ''}>gram</option>
+                    <option value="lts" ${row.unit === 'lts' ? 'selected' : ''}>lts</option>
+                    <option value="ml" ${row.unit === 'ml' ? 'selected' : ''}>ml</option>
+                    <option value="mt" ${row.unit === 'mt' ? 'selected' : ''}>mt</option>
+                    <option value="no" ${row.unit === 'no' ? 'selected' : ''}>no</option>
+                </select>
             </td>
             <td style="padding:0.75rem 0.5rem;">
                 <input class="costInput text-center" data-idx="${idx}" type="number" min="0" step="0.01" 
@@ -154,42 +132,11 @@ function renderRows(uniqueMaterials) {
 
     // Attach event listeners to the new elements
     document.querySelectorAll('.materialSelect').forEach(sel => sel.onchange = onMaterialOrUnitChange);
-    document.querySelectorAll('.bottleSelect').forEach(sel => sel.onchange = onBottleChange);
     document.querySelectorAll('.qtyInput').forEach(inp => {
         inp.oninput = onQuantityChange;
     });
     document.querySelectorAll('.unitSelect').forEach(sel => sel.onchange = onMaterialOrUnitChange);
 
-    updateTotals();
-}
-
-/**
- * Handles changes in the bottle selection.
- * @param {Event} e - the change event.
- */
-function onBottleChange(e) {
-    const idx = +e.target.dataset.idx;
-    const row = materialRows[idx];
-    
-    row.bottleId = e.target.value;
-    const bottle = bottleDatabase.find(b => b.id === row.bottleId);
-    
-    if (bottle) {
-        row.costPerUnit = bottle.cost;
-        row.totalCost = (row.quantity || 1) * row.costPerUnit;
-        
-        // Update the cost input display
-        const rowEl = e.target.closest('tr');
-        const costInputEl = rowEl.querySelector('.costInput');
-        const totalCostSpanEl = rowEl.querySelector(`#totalCost-${idx}`);
-        
-        if (costInputEl) costInputEl.value = row.costPerUnit.toFixed(2);
-        if (totalCostSpanEl) totalCostSpanEl.textContent = `₹${row.totalCost.toFixed(2)}`;
-    } else {
-        row.costPerUnit = 0;
-        row.totalCost = 0;
-    }
-    
     updateTotals();
 }
 
@@ -306,7 +253,14 @@ window.removeRow = function(idx) {
 function updateTotals() {
     const totalMaterial = materialRows.reduce((sum, r) => sum + (r.totalCost || 0), 0);
     totalMaterialCostSpan.textContent = `₹${totalMaterial.toFixed(2)}`;
-    totalCostSpan.textContent = `₹${totalMaterial.toFixed(2)}`;
+    
+    // Calculate bottle cost from inputs
+    const numBottles = parseFloat(numBottlesInput.value) || 0;
+    const costPerBottle = parseFloat(costPerBottleInput.value) || 0;
+    const bottleCost = numBottles * costPerBottle;
+    
+    totalBottleCostSpan.textContent = `₹${bottleCost.toFixed(2)}`;
+    totalCostSpan.textContent = `₹${(totalMaterial + bottleCost).toFixed(2)}`;
 }
 
 /**
@@ -500,13 +454,15 @@ function clearResults() {
                 <div style="font-size:1.25rem;font-weight:700;" id="resultMargin2"></div>
                 <div style="color:#666;font-size:0.875rem;">(Base Cost + Margin 1) × 12%</div>
             </div>
+            <div style="padding:1.2rem;background:#f0f0f0;text-align:center;">
+                <div style="color:#666;margin-bottom:0.5rem;">Price Per Bottle (₹)</div>
+                <div style="font-size:1.25rem;font-weight:700;" id="resultPricePerBottle"></div>
+                <div style="color:#666;font-size:0.875rem;">Total Price ÷ Number of Bottles</div>
+            </div>
         </div>
         <div style="margin-top:1.5rem;text-align:center;padding:1.2rem;background:#234123;color:white;border-radius:12px;">
             <div style="margin-bottom:0.5rem;">Total Selling Price</div>
             <div style="font-size:1.5rem;font-weight:700;" id="resultTotalPrice"></div>
-            <div style="font-size:0.95rem;margin-top:0.5rem;">
-                Gross Selling Price per Bottle: <span id="resultPricePerBottle"></span>
-            </div>
         </div>
     `;
 }
@@ -538,9 +494,13 @@ async function handleCalculation(shouldSave) {
             return;
         }
 
+        // Calculate total cost from all rows
         const totalMaterial = materialRows.reduce((sum, r) => sum + (r.totalCost || 0), 0);
-        const numBottles = +numBottlesInput.value;
-        const costPerBottle = +costPerBottleInput.value;
+        
+        // Get bottle information from inputs
+        const numBottles = parseFloat(numBottlesInput.value) || 0;
+        const costPerBottle = parseFloat(costPerBottleInput.value) || 0;
+        const bottleCost = numBottles * costPerBottle;
         
         const productName = productNameInput.value.trim();
         if (!productName) {
@@ -552,41 +512,17 @@ async function handleCalculation(shouldSave) {
             pricingResultsDiv.style.display = 'block';
             return;
         }
-        
-        if (numBottles <= 0) {
-            pricingResultsDiv.innerHTML = `
-                <div style="padding:1rem;background:#fee2e2;color:#991b1b;border-radius:8px;text-align:center;">
-                    Please enter a valid number of bottles (greater than 0).
-                </div>
-            `;
-            pricingResultsDiv.style.display = 'block';
-            return;
-        }
-        
-        if (shouldSave) {
-            const stockErrors = await checkStock();
-            if (stockErrors.length > 0) {
-                const errorHtml = `
-                    <div style="padding:1rem;background:#fee2e2;color:#991b1b;border-radius:8px;">
-                        <h4 style="font-weight:600;margin-bottom:0.5rem;">Stock Check Failed:</h4>
-                        <ul style="list-style-type:disc;padding-left:1.5rem;">
-                            ${stockErrors.map(err => `<li>${err}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-                pricingResultsDiv.innerHTML = errorHtml;
-                pricingResultsDiv.style.display = 'block';
-                return;
-            }
-        }
 
-        const bottleCost = numBottles * costPerBottle;
-        const baseCost = totalMaterial + bottleCost;
+        // Calculate ingredient cost (all rows are ingredients now)
+        const ingredientCost = totalMaterial;
+        
+        // Base cost is ingredients + bottles
+        const baseCost = ingredientCost + bottleCost;
 
         const margin1 = baseCost * 1.13;
         const margin2 = (baseCost + margin1) * 0.12;
         const totalSellingPrice = baseCost + margin1 + margin2;
-        const grossPerBottle = totalSellingPrice / numBottles;
+        const grossPerBottle = numBottles > 0 ? totalSellingPrice / numBottles : 0;
 
         const resultBasePriceEl = document.getElementById('resultBasePrice');
         const resultMargin1El = document.getElementById('resultMargin1');
@@ -605,11 +541,12 @@ async function handleCalculation(shouldSave) {
         if (shouldSave) {
             const productData = {
                 name: productName,
+                description: productDescriptionInput.value.trim() || '',
                 materialsUsed: materialRows.map(row => {
                     const materialInfo = materials.find(m => m.id === row.materialId) || {};
                     return {
                         materialId: row.materialId,
-                        materialName: materialInfo.material,
+                        materialName: materialInfo.material || 'Unknown',
                         quantity: row.quantity,
                         unit: row.unit,
                         costPerUnit: row.costPerUnit,
@@ -619,6 +556,7 @@ async function handleCalculation(shouldSave) {
                 bottleInfo: {
                     numBottles: numBottles,
                     costPerBottle: costPerBottle,
+                    totalBottleCost: bottleCost,
                 },
                 calculations: {
                     baseCost: baseCost,
@@ -689,6 +627,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize DOM elements now that DOM is loaded
     materialRowsDiv = document.getElementById('materialRows');
     totalMaterialCostSpan = document.getElementById('totalMaterialCost');
+    totalBottleCostSpan = document.getElementById('totalBottleCost');
     totalCostSpan = document.getElementById('totalCost');
     calculateBtn = document.getElementById('calculateBtn'); 
     calculateAndSaveBtn = document.getElementById('calculateAndSaveBtn'); 
@@ -699,6 +638,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadingIndicator = document.getElementById('loadingIndicator');
     viewAllPricesBtn = document.querySelector('.btn-view-prices');
     productNameInput = document.getElementById('productNameInput');
+    productDescriptionInput = document.getElementById('productDescriptionInput');
+    numBottlesInput = document.getElementById('numBottlesInput');
+    costPerBottleInput = document.getElementById('costPerBottleInput');
     
     console.log('DOM elements initialized:', {
         materialRowsDiv: !!materialRowsDiv,
@@ -719,13 +661,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         backdrop: !!backdrop
     });
     
-    // Add ingredient and bottle button event listeners
+    // Add ingredient button event listener
     const addIngredientBtn = document.getElementById('addIngredientBtn');
-    const addBottleBtn = document.getElementById('addBottleBtn');
     
-    console.log('All button elements found:', {
+    console.log('Button elements found:', {
         addIngredientBtn: !!addIngredientBtn,
-        addBottleBtn: !!addBottleBtn,
         materialRowsDiv: !!materialRowsDiv,
         calculateBtn: !!calculateBtn,
         calculateAndSaveBtn: !!calculateAndSaveBtn
@@ -754,7 +694,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('Current latestMaterials:', Object.keys(latestMaterials));
             
             materialRows.push({ 
-                type: 'ingredient',
                 materialId: '', 
                 quantity: '', 
                 unit: 'kg', 
@@ -779,36 +718,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('addIngredientBtn not found in DOM!');
     }
     
-    if (addBottleBtn) {
-        addBottleBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            console.log('Add Bottle button clicked');
-            console.log('Current materialRows length:', materialRows.length);
-            
-            materialRows.push({ 
-                type: 'bottle',
-                bottleId: '', 
-                quantity: 1, 
-                unit: '', 
-                costPerUnit: 0, 
-                totalCost: 0 
-            });
-            
-            console.log('Added bottle row, new length:', materialRows.length);
-            
-            // Check if we have the DOM element before trying to render
-            if (!materialRowsDiv) {
-                console.error('materialRowsDiv element not found in DOM!');
-                return;
-            }
-            
-            // Use the materials array that's populated when materials are fetched
-            renderRows(Object.values(latestMaterials));
-            updateTotals();
-            console.log('Finished adding bottle row');
-        });
-    } else {
-        console.error('addBottleBtn not found in DOM!');
+    // Add bottle input listeners
+    if (numBottlesInput) {
+        numBottlesInput.addEventListener('input', updateTotals);
+    }
+    if (costPerBottleInput) {
+        costPerBottleInput.addEventListener('input', updateTotals);
     }
     
     // Check if the required elements exist before adding listeners
