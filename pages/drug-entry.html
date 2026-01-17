@@ -362,6 +362,56 @@
         .dynamic-field-group .remove-btn:hover {
             background-color: #f8f8f8;
         }
+        
+        /* Custom Category Input Styling */
+        .custom-category-input-group {
+            margin-bottom: 12px;
+        }
+        
+        .custom-category-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .custom-category-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+        
+        .custom-category-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(35, 65, 35, 0.1);
+        }
+        
+        .remove-btn-inline {
+            padding: 10px 12px;
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+        }
+        
+        .remove-btn-inline:hover {
+            background-color: #fecaca;
+        }
+        
+        .remove-btn-inline i {
+            font-size: 14px;
+        }
 
         .multi-input-row {
             display: flex;
@@ -532,6 +582,9 @@
 
             <div id="customCategoriesSection" class="mt-4 hidden">
                 <label class="section-title">Custom Categories</label>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">
+                    Add any additional categories not listed above.    
+                </p>
                 <div id="customCategoryFields">
                     <!-- Custom category input fields will go here -->
                 </div>
@@ -753,12 +806,16 @@
             const customCategoriesSection = document.getElementById("customCategoriesSection");
             if (_showAllCategories) {
                 customCategoriesSection.classList.remove('hidden');
-                renderCustomCategoryFields();
+                // Don't re-render custom category fields to prevent losing focus
             } else {
                 customCategoriesSection.classList.add('hidden');
+                // Clean up custom categories that are not saved
                 _selectedCategories = _selectedCategories.filter(cat => _allCategories.includes(cat));
+                // Clear custom category fields when hiding
+                const customContainer = document.getElementById("customCategoryFields");
+                customContainer.innerHTML = '';
                 customCategoryFields = [];
-                renderCustomCategoryFields();
+                updateRemoveButtonVisibility("removeCustomCategoryBtn", customCategoryFields);
             }
         }
 
@@ -812,12 +869,10 @@
                 fieldArray = anotherFields;
                 removeButtonId = "removeAnotherFieldBtn";
             } else if (type === "customCategory") {
-                const categoryText = elementToRemove.querySelector('input').value.trim();
-                _selectedCategories = _selectedCategories.filter(cat => cat !== categoryText);
+                // Already handled in the remove button onclick
                 customCategoryFields = customCategoryFields.filter(f => f.div !== elementToRemove);
                 fieldArray = customCategoryFields;
                 removeButtonId = "removeCustomCategoryBtn";
-                renderCategories();
             }
             updateRemoveButtonVisibility(removeButtonId, fieldArray);
         }
@@ -901,38 +956,113 @@
         function addCustomCategoryField() {
             const container = document.getElementById("customCategoryFields");
             const groupDiv = document.createElement("div");
-            groupDiv.className = "dynamic-field-group";
+            groupDiv.className = "custom-category-input-group";
+
+            const inputWrapper = document.createElement("div");
+            inputWrapper.className = "custom-category-input-wrapper";
 
             const input = document.createElement("input");
             input.type = "text";
             input.placeholder = "Enter custom category name...";
-            input.className = "customCategoryName";
-            input.required = true;
+            input.className = "custom-category-input";
+            input.required = false;
+            
+            let previousValue = '';
+            
             input.oninput = () => {
                 const categoryText = input.value.trim();
-                if (customCategoryFields.some(field => field.input.value.trim() === categoryText && field.input !== input)) {
+                
+                // Check for duplicate in other fields
+                if (categoryText && customCategoryFields.some(field => field.input !== input && field.input.value.trim() === categoryText)) {
                     showMessage("This category already exists.", 'error');
+                    input.value = previousValue;
                     return;
                 }
-                _selectedCategories = _selectedCategories.filter(cat => cat !== categoryText);
-                if (categoryText) {
-                    _selectedCategories.push(categoryText);
-                }
-                renderCategories();
+                
+                previousValue = input.value;
             };
+            
+            // Add category when user presses Enter or loses focus
+            const saveCategory = () => {
+                const categoryText = input.value.trim();
+                if (categoryText) {
+                    // Remove any previous value from this input
+                    const oldValue = input.getAttribute('data-saved-value');
+                    if (oldValue) {
+                        _selectedCategories = _selectedCategories.filter(cat => cat !== oldValue);
+                    }
+                    
+                    // Add new value
+                    if (!_selectedCategories.includes(categoryText)) {
+                        _selectedCategories.push(categoryText);
+                        input.setAttribute('data-saved-value', categoryText);
+                        showMessage(`Category "${categoryText}" added!`, 'success');
+                        updateCategoryChipsDisplay();
+                    }
+                }
+            };
+            
+            input.addEventListener('blur', saveCategory);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    saveCategory();
+                }
+            });
 
             const removeBtn = document.createElement("button");
             removeBtn.type = "button";
-            removeBtn.className = "remove-btn";
+            removeBtn.className = "remove-btn-inline";
             removeBtn.innerHTML = `<i class="fas fa-trash-alt"></i>`;
-            removeBtn.onclick = () => removeDynamicField("customCategory", groupDiv);
+            removeBtn.onclick = () => {
+                const savedValue = input.getAttribute('data-saved-value');
+                if (savedValue) {
+                    _selectedCategories = _selectedCategories.filter(cat => cat !== savedValue);
+                    updateCategoryChipsDisplay();
+                }
+                removeDynamicField("customCategory", groupDiv);
+            };
 
-            groupDiv.appendChild(input);
-            groupDiv.appendChild(removeBtn);
+            inputWrapper.appendChild(input);
+            inputWrapper.appendChild(removeBtn);
+            groupDiv.appendChild(inputWrapper);
             container.appendChild(groupDiv);
 
             customCategoryFields.push({ input: input, div: groupDiv });
             updateRemoveButtonVisibility("removeCustomCategoryBtn", customCategoryFields);
+            
+            // Focus the new input
+            input.focus();
+        }
+        
+        function updateCategoryChipsDisplay() {
+            const container = document.getElementById("categoriesContainer");
+            container.innerHTML = '';
+
+            const categoriesToRender = _showAllCategories
+                ? _allCategories
+                : _allCategories.slice(0, categoriesToDisplayLimit);
+
+            categoriesToRender.forEach(category => {
+                const isSelected = _selectedCategories.includes(category);
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = `chip ${isSelected ? 'selected' : ''}`;
+                chip.innerHTML = `<i class="fas ${isSelected ? 'fa-check' : 'fa-plus'} icon"></i> ${category}`;
+                chip.onclick = () => toggleCategory(category);
+                container.appendChild(chip);
+            });
+            
+            // Add custom categories that are selected but not in predefined list
+            const customCategories = _selectedCategories.filter(cat => !_allCategories.includes(cat));
+            customCategories.forEach(category => {
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = "chip selected";
+                chip.innerHTML = `<i class="fas fa-check icon"></i> ${category} <span style="font-size: 10px; opacity: 0.7;">(custom)</span>`;
+                chip.onclick = () => toggleCategory(category);
+                container.appendChild(chip);
+            });
         }
 
         function renderCustomCategoryFields() {
@@ -1063,7 +1193,14 @@
         document.getElementById("addAnotherFieldBtn").addEventListener("click", addAnotherField);
         document.getElementById("removeCustomCategoryBtn").addEventListener("click", () => {
             const lastField = customCategoryFields[customCategoryFields.length - 1];
-            if (lastField) removeDynamicField("customCategory", lastField.div);
+            if (lastField) {
+                const savedValue = lastField.input.getAttribute('data-saved-value');
+                if (savedValue) {
+                    _selectedCategories = _selectedCategories.filter(cat => cat !== savedValue);
+                    updateCategoryChipsDisplay();
+                }
+                removeDynamicField("customCategory", lastField.div);
+            }
         });
         document.getElementById("removeDiseaseBtn").addEventListener("click", () => {
             const lastField = diseaseFields[diseaseFields.length - 1];
