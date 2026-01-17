@@ -608,22 +608,7 @@
 
     <!-- Firebase and Form Logic -->
     <script type="module">
-        // Topbar logout button for desktop
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoutTopbarBtn = document.getElementById('logoutTopbarBtn');
-            if (logoutTopbarBtn) {
-                logoutTopbarBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js').then(({ signOut }) => signOut(getAuth()));
-                        window.location.href = '../login.html';
-                    } catch (error) {
-                        console.error("Error signing out: ", error);
-                    }
-                });
-            }
-        });
-        import { db, userId, appId, initializeFirebase, collection, addDoc, getDocs, Timestamp } from "../js/firebase-config.js";
+        import { db, userId, appId, initializeFirebase, collection, addDoc, getDocs, Timestamp } from "../firebase-config.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -1094,69 +1079,61 @@
         });
 
         // --- Drawer Toggle Logic (reused) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('hamburgerBtn');
-            const drawer = document.getElementById('drawerNav');
-            const backdrop = document.getElementById('backdrop');
-            const logoutLink = document.getElementById('logoutLink');
+        const btn = document.getElementById('hamburgerBtn');
+        const drawer = document.getElementById('drawerNav');
+        const backdrop = document.getElementById('backdrop');
+        const logoutLink = document.getElementById('logoutLink');
 
-            if (btn && drawer && backdrop) {
-                function openDrawer() {
-                    drawer.classList.add('open');
-                    backdrop.classList.add('open');
-                    drawer.setAttribute('aria-hidden', 'false');
-                    btn.setAttribute('aria-expanded', 'true');
-                    const firstLink = drawer.querySelector('a');
-                    if (firstLink) firstLink.focus({ preventScroll: true });
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function closeDrawer() {
-                    drawer.classList.remove('open');
-                    backdrop.classList.remove('open');
-                    drawer.setAttribute('aria-hidden', 'true');
-                    btn.setAttribute('aria-expanded', 'false');
-                    btn.focus({ preventScroll: true });
-                    document.body.style.overflow = '';
-                }
-
-                btn.addEventListener('click', () => {
-                    drawer.classList.contains('open') ? closeDrawer() : openDrawer();
-                });
-
-                backdrop.addEventListener('click', closeDrawer);
-
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-                });
-
-                drawer.addEventListener('click', (e) => {
-                    if (e.target.closest('a[href]')) closeDrawer();
-                });
-
-                // Add logout functionality to the drawer
-                if (logoutLink) {
-                    logoutLink.addEventListener('click', async (e) => {
-                        e.preventDefault();
-                        try {
-                            await signOut(getAuth());
-                            console.log("User signed out successfully.");
-                            window.location.href = '../login.html';
-                        } catch (error) {
-                            console.error("Error signing out: ", error);
-                        }
-                    });
-                }
-            } else {
-                console.error('Drawer elements not found. Check your HTML IDs.');
+        if (btn && drawer && backdrop) {
+            function openDrawer() {
+                drawer.classList.add('open');
+                backdrop.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                btn.setAttribute('aria-expanded', 'true');
+                const firstLink = drawer.querySelector('a');
+                if (firstLink) firstLink.focus({ preventScroll: true });
+                document.body.style.overflow = 'hidden';
             }
-        });
-    </script>
-    <script>
-    // Hamburger menu logic (copied from all-materials.js)
-    document.addEventListener('DOMContentLoaded', function () {
-    // ...existing code...
-    });
+
+            function closeDrawer() {
+                drawer.classList.remove('open');
+                backdrop.classList.remove('open');
+                drawer.setAttribute('aria-hidden', 'true');
+                btn.setAttribute('aria-expanded', 'false');
+                btn.focus({ preventScroll: true });
+                document.body.style.overflow = '';
+            }
+
+            btn.addEventListener('click', () => {
+                drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+            });
+
+            backdrop.addEventListener('click', closeDrawer);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+            });
+
+            drawer.addEventListener('click', (e) => {
+                if (e.target.closest('a[href]')) closeDrawer();
+            });
+
+            // Add logout functionality to the drawer
+            if (logoutLink) {
+                logoutLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await signOut(getAuth());
+                        console.log("User signed out successfully.");
+                        window.location.href = '../login.html';
+                    } catch (error) {
+                        console.error("Error signing out: ", error);
+                    }
+                });
+            }
+        } else {
+            console.error('Drawer elements not found. Check your HTML IDs.');
+        }
     </script>
 </body>
 </html>
