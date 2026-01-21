@@ -466,37 +466,6 @@
             display: block;
         }
         
-        .price-details p {
-            margin: 0;
-            padding: 0.25rem 0;
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-        
-        .price-details p strong {
-            font-weight: 600;
-        }
-
-        .price-details h4 {
-            margin: 1rem 0 0.5rem;
-            font-weight: 700;
-            font-size: 1rem;
-        }
-        
-        .price-details ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .price-details li {
-            padding: 0.25rem 0;
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-        
         .card-actions {
             display: flex;
             gap: 0.5rem;
@@ -509,13 +478,158 @@
             color: var(--muted);
             cursor: pointer;
             font-size: 1.1rem;
+            transition: color 0.2s ease;
         }
 
         .action-btn:hover {
             color: var(--text);
         }
+        
+        .print-btn:hover {
+            color: #234123;
+        }
+        
         .delete-btn:hover {
             color: #dc2626;
+        }
+        
+        /* New Layout Styles */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            background: #f9f9f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            color: var(--text);
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1.5rem 0 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .ingredients-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .ingredients-table th,
+        .ingredients-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .ingredients-table th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .ingredients-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .ingredients-table tbody tr:hover {
+            background: #f0fdf4;
+        }
+        
+        .ingredients-table tfoot td {
+            background: #e8f5e9;
+            font-weight: 700;
+            color: var(--primary);
+            border-top: 2px solid var(--primary);
+        }
+        
+        .calc-grid {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .calc-row:last-child {
+            border-bottom: none;
+        }
+        
+        .calc-row span:first-child {
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .calc-row span:last-child {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .calc-row.highlight {
+            background: #f0fdf4;
+            font-weight: 600;
+        }
+        
+        .calc-row.highlight span {
+            font-weight: 700;
+        }
+        
+        .calc-row.primary {
+            background: var(--primary);
+            padding: 1rem;
+        }
+        
+        .calc-row.primary span {
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .timestamp {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--muted);
+            text-align: right;
+            font-style: italic;
         }
 
         /* Delete Confirmation Modal */
@@ -631,14 +745,14 @@
                 <span class="hamburger" aria-hidden="true"></span>
             </button>
         </div>
-        <img src="../assets/vasavi-logo.png" onerror="this.onerror=null; this.src='https://placehold.co/84x40/e5e7eb/6b7280?text=Logo'" alt="Vasavi Ayurveda Logo" class="topbar-logo">
+        <img src="../assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo" class="topbar-logo">
     </header>
 
     <!-- Drawer navigation -->
     <nav class="drawer" id="drawerNav" aria-hidden="true">
         <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px;">
             <div class="drawer-logo">
-                <img src="../assets/vasavi-logo.png" onerror="this.onerror=null; this.src='https://placehold.co/80x40/e5e7eb/6b7280?text=Logo'" alt="Vasavi Ayurveda Logo">
+                <img src="../assets/vasavi-logo.png" alt="Vasavi Ayurveda Logo">
             </div>
             <a href="../index.html" class="drawer-link">Home</a>
             <a href="add-material.html" class="drawer-link">Add Material</a>

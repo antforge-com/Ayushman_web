@@ -162,22 +162,28 @@ const displayProductPrices = (productPrices) => {
         const bottleCost = bottleInfo.numBottles !== undefined && bottleInfo.costPerBottle !== undefined ? `₹${(bottleInfo.numBottles * bottleInfo.costPerBottle).toFixed(2)}` : 'N/A';
         const totalMaterialCost = materialsUsed.reduce((sum, material) => sum + (material.totalCost || 0), 0).toFixed(2);
         
-        const ingredientsList = materialsUsed.map(material => `
-            <li>
-                <span>${material.materialName || 'N/A'}</span>
-                <span>${material.quantity} ${material.unit}</span>
-            </li>
+        const ingredientsTable = materialsUsed.map((material, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${material.materialName || 'N/A'}</td>
+                <td>${material.quantity} ${material.unit}</td>
+                <td>₹${(material.costPerUnit || 0).toFixed(2)}</td>
+                <td>₹${(material.totalCost || 0).toFixed(2)}</td>
+            </tr>
         `).join('');
 
         return `
-            <article class="price-card">
+            <article class="price-card" id="product-${item.id}">
                 <header class="price-header flex justify-between items-center" data-id="${item.id}">
                     <div class="flex items-center gap-2">
                         <h3>${item.name || `Price Calculation ${date}`}</h3>
                     </div>
                     <div class="flex items-center gap-4">
                          <div class="card-actions">
-                            <button class="action-btn delete-btn" onclick="openDeleteModal('${item.id}', event)">
+                            <button class="action-btn print-btn" onclick="printProduct('${item.id}', event)" title="Print">
+                                <i class="fa-solid fa-print"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="openDeleteModal('${item.id}', event)" title="Delete">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
@@ -186,22 +192,84 @@ const displayProductPrices = (productPrices) => {
                     </div>
                 </header>
                 <div class="price-body hidden" id="details-${item.id}">
-                    <div class="price-details flex flex-col gap-2">
-                        <h4>Calculations</h4>
-                        <p><strong>Total Material Cost:</strong> <span>₹${totalMaterialCost}</span></p>
-                        <p><strong>Total Bottle Cost:</strong> <span>${bottleCost}</span></p>
-                        <p><strong>Base Cost:</strong> <span>${baseCost}</span></p>
-                        <p><strong>Margin 1 (113%):</strong> <span>${margin1}</span></p>
-                        <p><strong>Margin 2 (12%):</strong> <span>${margin2}</span></p>
-                        <p><strong>Total Selling Price:</strong> <span>${totalSellingPrice}</span></p>
-                        <p><strong>Gross Price per Bottle:</strong> <span>${grossPerBottle}</span></p>
+                    <div class="price-details">
+                        <!-- Product Information Table -->
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Date:</span>
+                                <span class="info-value">${date}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Drug Name:</span>
+                                <span class="info-value">${item.name || 'N/A'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Cost:</span>
+                                <span class="info-value">${baseCost}</span>
+                            </div>
+                        </div>
 
-                        <h4>Ingredients Used</h4>
-                        <ul>
-                            ${ingredientsList}
-                        </ul>
+                        <!-- Ingredients Table -->
+                        <h4 class="section-title">Ingredients</h4>
+                        <table class="ingredients-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ingredient</th>
+                                    <th>Quantity</th>
+                                    <th>Price/Unit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${ingredientsTable}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" style="text-align: right; font-weight: 600;">Sum:</td>
+                                    <td style="font-weight: 700;">₹${totalMaterialCost}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                        <!-- Calculations Section -->
+                        <h4 class="section-title">Calculations</h4>
+                        <div class="calc-grid">
+                            <div class="calc-row">
+                                <span>Total Bottles with Labels:</span>
+                                <span>${bottleInfo.numBottles || 'N/A'}</span>
+                            </div>
+                            <div class="calc-row">
+                                <span>Total Material Cost:</span>
+                                <span>₹${totalMaterialCost}</span>
+                            </div>
+                            <div class="calc-row">
+                                <span>Total Bottle Cost:</span>
+                                <span>${bottleCost}</span>
+                            </div>
+                            <div class="calc-row highlight">
+                                <span>Base Cost (Sum + Bottle):</span>
+                                <span>${baseCost}</span>
+                            </div>
+                            <div class="calc-row">
+                                <span>Margin 1 (113%):</span>
+                                <span>${margin1}</span>
+                            </div>
+                            <div class="calc-row">
+                                <span>Margin 2 (12%):</span>
+                                <span>${margin2}</span>
+                            </div>
+                            <div class="calc-row highlight">
+                                <span>Total Selling Price:</span>
+                                <span>${totalSellingPrice}</span>
+                            </div>
+                            <div class="calc-row primary">
+                                <span>Each Bottle Price:</span>
+                                <span>${grossPerBottle}</span>
+                            </div>
+                        </div>
                         
-                        <p style="margin-top:1rem;"><strong>Calculated on:</strong> <span>${date} at ${time}</span></p>
+                        <p class="timestamp">Calculated on: ${date} at ${time}</p>
                     </div>
                 </div>
             </article>
@@ -238,6 +306,221 @@ window.openDeleteModal = (productId, event) => {
     event.stopPropagation(); // Prevent card from expanding
     selectedProductIdForDeletion = productId;
     deleteModal.classList.remove('hidden');
+};
+
+/**
+ * Prints a specific product card.
+ * @param {string} productId - The ID of the product to print.
+ * @param {Event} event - The event object to stop propagation.
+ */
+window.printProduct = (productId, event) => {
+    event.stopPropagation(); // Prevent card from expanding
+    
+    const productCard = document.getElementById(`product-${productId}`);
+    const detailsSection = document.getElementById(`details-${productId}`);
+    
+    if (!productCard || !detailsSection) {
+        console.error('Product card not found');
+        alert('Error: Product not found');
+        return;
+    }
+    
+    // Temporarily expand the card if it's collapsed
+    const wasHidden = detailsSection.classList.contains('hidden');
+    if (wasHidden) {
+        detailsSection.classList.remove('hidden');
+    }
+    
+    // Clone the product card for printing
+    const printContent = productCard.cloneNode(true);
+    
+    // Remove action buttons from the cloned content
+    const actionButtons = printContent.querySelectorAll('.card-actions');
+    actionButtons.forEach(btn => btn.remove());
+    
+    // Remove toggle icon
+    const toggleIcon = printContent.querySelector('.toggle-icon');
+    if (toggleIcon) toggleIcon.remove();
+    
+    // Ensure the details are visible in the clone
+    const clonedDetails = printContent.querySelector('.price-body');
+    if (clonedDetails) {
+        clonedDetails.classList.remove('hidden');
+        clonedDetails.classList.add('expanded');
+    }
+    
+    // Get the product name for the title
+    const productName = productCard.querySelector('h3') ? productCard.querySelector('h3').textContent : 'Product';
+    
+    // Create a print window
+    const printWindow = window.open('', '_blank');
+    
+    if (!printWindow) {
+        alert('Please allow popups for this site to enable printing');
+        if (wasHidden) {
+            detailsSection.classList.add('hidden');
+        }
+        return;
+    }
+    
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Print - ${productName}</title>
+            <meta charset="UTF-8">
+            <style>
+                * {
+                    box-sizing: border-box;
+                    font-family: Arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                }
+                body {
+                    margin: 10px;
+                    padding: 0;
+                    font-size: 12px;
+                }
+                .price-card {
+                    border: 2px solid #234123;
+                    border-radius: 6px;
+                    overflow: hidden;
+                }
+                .price-header {
+                    background: #234123;
+                    color: white;
+                    padding: 10px 12px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .price-header h3 {
+                    margin: 0;
+                    font-size: 16px;
+                }
+                .price-body {
+                    padding: 12px;
+                    display: block !important;
+                }
+                .info-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 8px;
+                    margin-bottom: 12px;
+                    border: 1px solid #ddd;
+                    padding: 10px;
+                    border-radius: 4px;
+                }
+                .info-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                }
+                .info-label {
+                    font-weight: 700;
+                    color: #234123;
+                    font-size: 10px;
+                    text-transform: uppercase;
+                }
+                .info-value {
+                    color: #333;
+                    font-size: 12px;
+                }
+                .section-title {
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #234123;
+                    margin: 12px 0 6px;
+                    padding-bottom: 3px;
+                    border-bottom: 2px solid #234123;
+                }
+                .ingredients-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 12px;
+                    font-size: 11px;
+                }
+                .ingredients-table th,
+                .ingredients-table td {
+                    border: 1px solid #ddd;
+                    padding: 5px 6px;
+                    text-align: left;
+                }
+                .ingredients-table th {
+                    background: #f0f0f0;
+                    font-weight: 700;
+                    color: #234123;
+                    font-size: 10px;
+                }
+                .ingredients-table tfoot td {
+                    background: #f9f9f9;
+                    font-weight: 600;
+                    font-size: 11px;
+                }
+                .calc-grid {
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    overflow: hidden;
+                }
+                .calc-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 6px 10px;
+                    border-bottom: 1px solid #eee;
+                    font-size: 11px;
+                }
+                .calc-row:last-child {
+                    border-bottom: none;
+                }
+                .calc-row.highlight {
+                    background: #f9f9f9;
+                    font-weight: 600;
+                }
+                .calc-row.primary {
+                    background: #234123;
+                    color: white;
+                    font-weight: 700;
+                    font-size: 13px;
+                    padding: 8px 10px;
+                }
+                .timestamp {
+                    margin-top: 10px;
+                    font-size: 10px;
+                    color: #666;
+                    text-align: right;
+                    font-style: italic;
+                }
+                @media print {
+                    body { margin: 0; }
+                    .price-card { border-radius: 0; }
+                }
+            </style>
+        </head>
+        <body>
+            ${printContent.outerHTML}
+            <script>
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 250);
+                };
+                
+                window.onafterprint = function() {
+                    window.close();
+                };
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Restore original state if it was hidden
+    if (wasHidden) {
+        setTimeout(() => {
+            detailsSection.classList.add('hidden');
+        }, 500);
+    }
 };
 
 /**
