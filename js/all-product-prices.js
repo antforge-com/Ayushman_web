@@ -203,6 +203,12 @@ const displayProductPrices = (productPrices) => {
                                 <span class="info-label">Drug Name:</span>
                                 <span class="info-value">${item.name || 'N/A'}</span>
                             </div>
+                            ${item.description ? `
+                            <div class="info-item">
+                                <span class="info-label">Description:</span>
+                                <span class="info-value">${item.description}</span>
+                            </div>
+                            ` : ''}
                             <div class="info-item">
                                 <span class="info-label">Cost:</span>
                                 <span class="info-value">${baseCost}</span>
